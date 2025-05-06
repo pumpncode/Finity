@@ -1,0 +1,67 @@
+[manifest]
+version = "1.0.0"
+dump_lua = true
+priority = 1
+
+[[patches]]
+[patches.pattern]
+target = "tag.lua"
+pattern = "if self.name == 'Double Tag' and _context.tag.key ~= 'tag_double' then"
+position = "at"
+payload = '''if self.name == 'Double Tag' and _context.tag.key ~= 'tag_double' and _context.tag.key ~= 'tag_finity_showdown' then'''
+match_indent = true
+overwrite = true
+
+[[patches]]
+[patches.pattern]
+target = "game.lua"
+pattern = "self.GAME.round_resets.blind_choices.Boss = get_new_boss()"
+position = "before"
+payload = '''
+if G.GAME.selected_back.name == "b_finity_challenger" and CardSleeves and G.GAME.selected_sleeve and G.GAME.selected_sleeve == "sleeve_finity_challenger" then
+    self.GAME.round_resets.blind_choices.Big = get_new_boss()
+end
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = 'card.lua'
+pattern = '''
+if self.ability.perishable and self.ability.perish_tally <= 0 then 
+    if not self.debuff then
+        self.debuff = true
+        if self.area == G.jokers then self:remove_from_deck(true) end
+    end
+    return
+end
+'''
+position = 'after'
+payload = '''
+if next(SMODS.find_card("j_finity_periwinklepinecone")) and self.seal then should_debuff = false end
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "functions/state_events.lua"
+pattern = "if G.GAME.blind:get_type() == 'Boss' then"
+position = "at"
+payload = "if G.GAME.blind_on_deck == 'Boss' then"
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "functions/state_events.lua"
+pattern = "if G.GAME.round_resets.ante == G.GAME.win_ante and G.GAME.blind:get_type() == 'Boss' then"
+position = "at"
+payload = "if G.GAME.round_resets.ante >= G.GAME.win_ante and G.GAME.blind_on_deck == 'Boss' then"
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "functions/state_events.lua"
+pattern = "elseif G.GAME.round_resets.blind == G.P_BLINDS.bl_big then"
+position = "at"
+payload = "elseif G.GAME.blind_on_deck == 'Big' then"
+match_indent = true
