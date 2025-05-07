@@ -39,7 +39,7 @@ FinisherBossBlindStringMap = {
 	["bl_cry_vermillion_virus"] = {"j_finity_vermillionvirus","Vermillion Virus"},
 	["bl_cry_sapphire_stamp"] = {"j_finity_sapphirestamp","Sapphire Stamp"},
 	["bl_cry_obsidian_orb"] = {"j_finity_obsidianorb","Obsidian Orb"},
-	["bl_cry_trophy"] = {"j_finity_lemonthrophy","Lemon Throphy"},
+	["bl_cry_trophy"] = {"j_finity_lemontrophy","Lemon Trophy"},
 	["bl_akyrs_final_periwinkle_pinecone"] = {"j_finity_periwinklepinecone","Periwinkle Pinecone"},
 	["bl_akyrs_final_razzle_raindrop"] = {"j_finity_razzleraindrop","Razzle Raindrop"},
 	["bl_akyrs_final_lilac_lasso"] = {"j_finity_lilaclasso","Lilac Lasso"}
@@ -702,9 +702,6 @@ SMODS.Back{
     },
 	apply = function(self)
         G.GAME.round_resets.blind_choices.Boss = get_new_boss()
-		if CardSleeves and G.GAME.selected_sleeve and G.GAME.selected_sleeve == "sleeve_finity_challenger" then
-			G.GAME.round_resets.blind_choices.Big = get_new_boss()
-		end
     end
 }
 if CardSleeves then
@@ -1036,11 +1033,11 @@ SMODS.Joker {
 	end,
 }
 SMODS.Joker {
-    key = "lemonthrophy",
-    name = "Lemon Throphy",
+    key = "lemontrophy",
+    name = "Lemon Trophy",
     atlas = 'crybossjokers',
     loc_txt = {
-        name = "Lemon Throphy",
+        name = "Lemon Trophy",
         text = {
             "Set {X:chips,C:white}Chips{} to equal {X:mult,C:white}Mult",
         }
