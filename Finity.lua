@@ -38,7 +38,7 @@ FinisherBossBlindStringMap = {
 	["bl_cry_tornado"] = {"j_finity_turquoisetornado","Turquoise Tornado"},
 	["bl_cry_vermillion_virus"] = {"j_finity_vermillionvirus","Vermillion Virus"},
 	["bl_cry_sapphire_stamp"] = {"j_finity_sapphirestamp","Sapphire Stamp"},
-	["bl_obsidian_orb"] = {"j_finity_obsidianorb","Obsidian Orb"},
+	["bl_cry_obsidian_orb"] = {"j_finity_obsidianorb","Obsidian Orb"},
 	["bl_cry_trophy"] = {"j_finity_lemonthrophy","Lemon Throphy"},
 	["bl_akyrs_final_periwinkle_pinecone"] = {"j_finity_periwinklepinecone","Periwinkle Pinecone"},
 	["bl_akyrs_final_razzle_raindrop"] = {"j_finity_razzleraindrop","Razzle Raindrop"},
@@ -93,6 +93,7 @@ end_round = function()
         add_tag(Tag('tag_finity_showdown'))
 		play_sound('generic1', 0.9 + math.random()*0.1, 0.8)
         play_sound('holo1', 1.2 + math.random()*0.1, 0.4)
+		G.GAME.blind.savename = G.GAME.blind.config.blind.key
 		for i = 1, #G.GAME.tags do
 			if G.GAME.tags[i].key == "tag_finity_showdown" and G.GAME.tags[i].config.joker == "none" then
 				G.GAME.tags[i].config.joker = FinisherBossBlindStringMap[G.GAME.blind.config.blind.key][1]
@@ -549,7 +550,7 @@ function Card:set_sprites(_center, _front)
 		self.children.floating_sprite.role.draw_major = self
 		self.children.floating_sprite.states.hover.can = false
 		self.children.floating_sprite.states.click.can = false
-	end	
+	end
 end
 SMODS.DrawStep {
     key = 'finity',
@@ -671,6 +672,12 @@ function Game:start_run(args)
 			G.playing_cards[i].finity.floating_sprite_mark.role.draw_major = G.playing_cards[i]
 			G.playing_cards[i].finity.floating_sprite_mark.states.hover.can = false
 			G.playing_cards[i].finity.floating_sprite_mark.states.click.can = false
+		end
+	end
+	for i = 1, #G.GAME.tags do
+			if G.GAME.tags[i].key == "tag_finity_showdown" and G.GAME.tags[i].config.joker == "none" then
+				G.GAME.tags[i].config.joker = FinisherBossBlindStringMap[G.GAME.blind.config.blind.key][1]
+				G.GAME.tags[i].config.display = FinisherBossBlindStringMap[G.GAME.blind.config.blind.key][2]
 		end
 	end
 end
