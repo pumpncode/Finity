@@ -1241,18 +1241,18 @@ SMODS.Joker {
 	end
 }
 local old_card_is_suit = Card.is_suit
-function Card:is_suit(bypass_debuff, flush_calc)
+function Card:is_suit(suit, bypass_debuff, flush_calc)
 	if flush_calc then
 		if self.ability and self.ability.finityrazzleraindropmark and not self.debuff then
 			return true
 		end
-		return old_card_is_suit(suit, bypass_debuff, flush_calc)
+		return old_card_is_suit(self, suit, bypass_debuff, flush_calc)
 	else
 		if self.debuff and not bypass_debuff then return end
 		if self.ability and self.ability.finityrazzleraindropmark and not self.debuff then
 			return true
 		end
-		return old_card_is_suit(self, bypass_debuff, flush_calc)
+		return old_card_is_suit(self, suit, bypass_debuff, flush_calc)
 	end
 end
 end
