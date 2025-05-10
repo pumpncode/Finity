@@ -298,6 +298,9 @@ SMODS.Joker {
 	remove_from_deck = function(self, card, from_debuff)
 		for i = 1, #G.jokers.cards do
 			G.jokers.cards[i].pinned = false
+			if G.jokers.cards[i].ability.pinned then
+				G.jokers.cards[i].ability.pinned = false
+			end
 		end
 	end
 }
