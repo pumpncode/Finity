@@ -777,10 +777,13 @@ local oldclick = Card.click
 					and (safely_get(G.GAME, "viewed_back", "effect", "center", "finitychanging") and (self.back == "viewed_back" or self.edeck_select))
 			then
 				local eligible_bosses = {}
-				local _displayname
 				for k, v in pairs(G.P_BLINDS) do
 					if v.boss and v.boss.showdown then
-						eligible_bosses[k] = FinisherBossBlindStringMap[k][2]
+						if FinisherBossBlindStringMap[k] then
+							eligible_bosses[k] = FinisherBossBlindStringMap[k][2]
+						else
+							eligible_bosses[k] = v.name
+						end
 					end
 				end
 				local _keys = {}
