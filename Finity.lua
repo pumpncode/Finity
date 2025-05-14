@@ -7,6 +7,7 @@ SMODS.Atlas({key = 'consumables', path = 'consumables.png', px = 71, py = 95})
 SMODS.Atlas({key = 'marks', path = 'marks.png', px = 71, py = 95})
 SMODS.Atlas({key = 'backs', path = 'backs.png', px = 71, py = 95})
 SMODS.Atlas({key = 'sleeves', path = 'sleeves.png', px = 73, py = 94})
+SMODS.Atlas({key = 'blinddeck', path = 'blinddeck.png', px = 71, py = 95})
 
 
 SMODS.current_mod.optional_features = function()
@@ -25,8 +26,8 @@ SMODS.Rarity({
 
 --this dictionary-structured table is used to check if a boss blind has a
 --relative boss Joker, your mod should add to this table:
---["boss blind key"] = {"joker key", "boss blind display name" (used for showdown tag's description)}
---while the mod is meant for finisher boss blinds specifically, nothing stops you from using regular boss blinds
+--["boss blind key"] = {"joker key", "boss blind display name" (used for showdown tag's description and other stuff)}
+--while the mod is meant for showdown boss blinds specifically, nothing stops you from using regular boss blinds
 
 FinisherBossBlindStringMap = {
     ["bl_final_acorn"] = {"j_finity_amberacorn","Amber Acorn"},
@@ -44,8 +45,28 @@ FinisherBossBlindStringMap = {
 	["bl_akyrs_final_razzle_raindrop"] = {"j_finity_razzleraindrop","Razzle Raindrop"},
 	["bl_akyrs_final_lilac_lasso"] = {"j_finity_lilaclasso","Lilac Lasso"}
 	}
-	
---and that's all you have to do with stuff here, create your boss joker, make sure to give it the boss rarity
+
+--this table assigns sprites for the Taunting deck and is completely optional	
+--["boss blind key"] = {"atlas key", "coordinates"}
+
+FinisherBossBlinddecksprites = {
+	placeholder = { "finity_blinddeck", { x = 5, y = 0 } },
+	["bl_final_acorn"] = {"finity_blinddeck",{ x = 2, y = 0 } },
+	["bl_final_leaf"] = {"finity_blinddeck",{ x = 3, y = 0 } },
+	["bl_final_vessel"] = {"finity_blinddeck",{ x = 4, y = 0 } },
+	["bl_final_heart"] = {"finity_blinddeck",{ x = 0, y = 0 } },
+	["bl_final_bell"] = {"finity_blinddeck",{ x = 1, y = 0 } },
+	["bl_cry_lavender_loop"] = {"finity_blinddeck",{ x = 3, y = 1 }}, --built-in cross-mod jokers
+	["bl_cry_tornado"] = {"finity_blinddeck",{ x = 5, y = 1 }},
+	["bl_cry_vermillion_virus"] = {"finity_blinddeck",{ x = 0, y = 1 }},
+	["bl_cry_sapphire_stamp"] = {"finity_blinddeck",{ x = 1, y = 1 }},
+	["bl_cry_obsidian_orb"] = {"finity_blinddeck",{ x = 2, y = 1 }},
+	["bl_cry_trophy"] = {"finity_blinddeck",{ x = 4, y = 1 }},
+	["bl_akyrs_final_periwinkle_pinecone"] = {"finity_blinddeck",{ x = 0, y = 2 }},
+	["bl_akyrs_final_razzle_raindrop"] = {"finity_blinddeck",{ x = 1, y = 2 }},
+	["bl_akyrs_final_lilac_lasso"] = {"finity_blinddeck",{ x = 2, y = 2 }}
+}
+--and that's all you have to do with stuff here, create your boss joker, make sure to give it the showdown rarity
 --and you're good to go, as you can see below the mod handles everything else by itself
 
 SMODS.Tag {
@@ -71,17 +92,31 @@ SMODS.Tag {
     }, --the tag creates a joker based on the string provided by the wrapped function below
     apply = function(self, tag, context)
         if context.type == "store_joker_create" then
-            local card
-                card = create_card("Joker", context.area, nil, nil, nil, nil,tag.config.joker)
-                create_shop_card_ui(card, "Joker", context.area)
-                card.states.visible = false
-                tag:yep("+", G.C.RARITY.finity_showdown, function()
-                    card:start_materialize()
-                    card:set_cost()
-                    return true
-                end)
-            tag.triggered = true
-            return card
+			if tag.config.joker ~= "none" then
+				local card
+					card = create_card("Joker", context.area, nil, nil, nil, nil,tag.config.joker)
+					create_shop_card_ui(card, "Joker", context.area)
+					card.states.visible = false
+					tag:yep("+", G.C.RARITY.finity_showdown, function()
+						card:start_materialize()
+						card:set_cost()
+						return true
+					end)
+				tag.triggered = true
+				return card
+			else
+				local card
+				card = create_card("Joker", context.area, nil, nil, nil, nil,nil)
+					create_shop_card_ui(card, "Joker", context.area)
+					card.states.visible = false
+					tag:yep("+", G.C.RARITY.finity_showdown, function()
+						card:start_materialize()
+						card:set_cost()
+						return true
+					end)
+				tag.triggered = true
+				return card
+			end
         end
     end,
 }
@@ -90,20 +125,17 @@ end_round = function()
     old_end_round()
 	G.E_MANAGER:add_event(Event({trigger = 'after',delay = 0.1,func = function()
     if FinisherBossBlindStringMap[G.GAME.blind.config.blind.key] then
-        add_tag(Tag('tag_finity_showdown'))
+		local tag = Tag('tag_finity_showdown')
+		tag.config.joker = FinisherBossBlindStringMap[G.GAME.blind.config.blind.key][1]
+		tag.config.display = FinisherBossBlindStringMap[G.GAME.blind.config.blind.key][2]
+        add_tag(tag)
 		play_sound('generic1', 0.9 + math.random()*0.1, 0.8)
         play_sound('holo1', 1.2 + math.random()*0.1, 0.4)
 		G.GAME.blind.savename = G.GAME.blind.config.blind.key
-		for i = 1, #G.GAME.tags do
-			if G.GAME.tags[i].key == "tag_finity_showdown" and G.GAME.tags[i].config.joker == "none" then
-				G.GAME.tags[i].config.joker = FinisherBossBlindStringMap[G.GAME.blind.config.blind.key][1]
-				G.GAME.tags[i].config.display = FinisherBossBlindStringMap[G.GAME.blind.config.blind.key][2]
-			end
-		end
     end  --this function reads the table above to check when to create the tag and what joker it will give
 	return true end}))
 end
---everything else below is just code for the jokers, consumable and unlocks
+--everything else below is just code for jokers, consumable and decks
 SMODS.Joker {
     key = "verdantleaf",
     name = "Verdant Leaf",
@@ -345,7 +377,7 @@ SMODS.Joker {
 			card.ability.hand_played = true
 		end
 		if context.retrigger_joker_check and not context.retrigger_joker and context.other_card then
-			if context.other_card.ability.finitycrimsonheartmark then
+			if context.other_card.ability and context.other_card.ability.finitycrimsonheartmark then
 				return {
 					message = localize("k_again_ex"),
 					repetitions = card.ability.extra.retriggers,
@@ -586,7 +618,7 @@ SMODS.DrawStep {
 				scale_mod,
 				rotate_mod,
 				nil,
-				-0.07
+				-0.2
 			)
         end
 		if self.config.center and (self.ability.finitycrimsonheartmark or self.ability.finityceruleanbellmark or self.ability.finityrazzleraindropmark) and self.finity and self.finity.floating_sprite_mark then
@@ -683,6 +715,7 @@ function Game:start_run(args)
 				G.GAME.tags[i].config.display = FinisherBossBlindStringMap[G.GAME.blind.config.blind.key][2]
 		end
 	end
+	--G.P_CENTERS.b_finity_taunting.atlas, G.P_CENTERS.b_finity_taunting.pos = G.PROFILES[G.SETTINGS.profile]["finityblinddeckdata"][6], G.PROFILES[G.SETTINGS.profile]["finityblinddeckdata"][7]
 end
 
 SMODS.Back{
@@ -707,6 +740,121 @@ SMODS.Back{
         G.GAME.round_resets.blind_choices.Boss = get_new_boss()
     end
 }
+G.finityblinddecktype = {"bl_final_bell","Cerulean Bell","notchange","atlas","pos"}
+SMODS.Back{
+   key = "taunting",
+    atlas = "blinddeck",
+    pos = {x = 5, y = 0},
+    loc_txt = {
+        name ="Taunting Deck",
+        text={
+			"{C:attention}Boss Blind{} is always {C:attention}#1#{}",
+			"{C:inactive}(Click to swap)",
+        },
+    },
+	finitychanging = "unknown",
+	config = {
+        blind = "none"
+    },
+	loc_vars = function(self, info_queue, center)
+		return { vars = {G.finityblinddecktype[2]} }
+	end,
+	apply = function(self)
+		G.PROFILES[G.SETTINGS.profile]["finityblinddeckdata"][5] = G.finityblinddecktype[1]
+		G.PROFILES[G.SETTINGS.profile]["finityblinddeckdata"][6] = G.finityblinddecktype[4]
+		G.PROFILES[G.SETTINGS.profile]["finityblinddeckdata"][7] = G.finityblinddecktype[5]
+    end
+}
+local oldclick = Card.click
+		function Card:click()
+			oldclick(self)
+			if
+				Galdur
+					and safely_get(Galdur, "run_setup", "current_page") == 1
+					and self.config.center.key == "b_finity_taunting"
+					and self.area == safely_get(Galdur, "run_setup", "selected_deck_area")
+				or not Galdur
+					and (safely_get(G.GAME, "viewed_back", "effect", "center", "finitychanging") and (self.back == "viewed_back" or self.edeck_select))
+			then
+				local eligible_bosses = {}
+				local _displayname
+				for k, v in pairs(G.P_BLINDS) do
+					if v.boss and v.boss.showdown then
+						eligible_bosses[k] = FinisherBossBlindStringMap[k][2]
+					end
+				end
+				local _keys = {}
+				local _values = {}
+				local _atlas
+				local _coords
+				for k, v in pairs(eligible_bosses) do
+					table.insert(_keys, k)
+					table.insert(_values, v)
+				end
+
+				for i, k in ipairs(_keys) do
+					if k == G.finityblinddecktype[1] then
+						local next_index = (i % #_keys) + 1
+						G.finityblinddecktype[1] = _keys[next_index]
+						G.finityblinddecktype[2] = _values[next_index]
+						if self.children.back then self.children.back:remove() end
+						if FinisherBossBlinddecksprites[_keys[next_index]] then
+							_atlas = FinisherBossBlinddecksprites[_keys[next_index]][1]
+							_coords = FinisherBossBlinddecksprites[_keys[next_index]][2]
+						else
+							_atlas = FinisherBossBlinddecksprites["placeholder"][1]
+							_coords = FinisherBossBlinddecksprites["placeholder"][2]
+						end
+						G.finityblinddecktype[4] = _atlas
+						G.finityblinddecktype[5] = _coords
+						self.children.back = Sprite(self.T.x, self.T.y, self.T.w, self.T.h, G.ASSET_ATLAS[_atlas], _coords)
+						self.children.back.states.hover = self.states.hover
+						self.children.back.states.click = self.states.click
+						self.children.back.states.drag = self.states.drag
+						self.children.back.states.collide.can = false
+						self.children.back:set_role({ major = self, role_type = 'Glued', draw_major = self })
+						G.P_CENTERS.b_finity_taunting.atlas, G.P_CENTERS.b_finity_taunting.pos = _atlas, _coords
+						G.finityblinddecktype[3] = "change"
+						if not G.PROFILES[G.SETTINGS.profile]["finityblinddeckdata"] then
+							G.PROFILES[G.SETTINGS.profile]["finityblinddeckdata"] = {}
+						end
+						G.PROFILES[G.SETTINGS.profile]["finityblinddeckdata"] = {_atlas,_coords,G.finityblinddecktype[1],G.finityblinddecktype[2],G.PROFILES[G.SETTINGS.profile]["finityblinddeckdata"][5],G.PROFILES[G.SETTINGS.profile]["finityblinddeckdata"][6],G.PROFILES[G.SETTINGS.profile]["finityblinddeckdata"][7]}
+						break
+					end
+				end
+			end
+		end
+
+old_RUN_SETUP_check_back = G.FUNCS.RUN_SETUP_check_back
+G.FUNCS.RUN_SETUP_check_back = function(e)
+	if G.GAME.viewed_back.name ~= e.config.id then
+	end
+	old_RUN_SETUP_check_back(e)
+	if G.GAME.viewed_back.name == "b_finity_taunting" and G.finityblinddecktype[3] == "change" then
+		e.config.object:remove() 
+		e.config.object = UIBox{
+      definition = G.GAME.viewed_back:generate_UI(),
+      config = {offset = {x=0,y=0}, align = 'cm', parent = e}
+    }
+	G.finityblinddecktype[3] = "notchange"
+	end
+end
+
+local old_init_game_object = Game.init_game_object
+function Game:init_game_object()
+	local ret =old_init_game_object(self)
+	local finityblinddecksave = G.PROFILES[G.SETTINGS.profile]["finityblinddeckdata"]
+	if finityblinddecksave and finityblinddecksave[1] and finityblinddecksave[2] then
+		G.P_CENTERS.b_finity_taunting.atlas, G.P_CENTERS.b_finity_taunting.pos = finityblinddecksave[1], finityblinddecksave[2]
+		G.finityblinddecktype[1] = finityblinddecksave[3]
+		G.finityblinddecktype[2] = finityblinddecksave[4]
+	else
+		G.P_CENTERS.b_finity_taunting.atlas, G.P_CENTERS.b_finity_taunting.pos = "finity_blinddeck", { x = 1, y = 0 }
+		G.PROFILES[G.SETTINGS.profile]["finityblinddeckdata"] = {}
+	end
+	return ret
+end
+		
 if CardSleeves then
     CardSleeves.Sleeve {
 		key = "challenger",
@@ -744,6 +892,10 @@ end
 
 local old_get_new_boss = get_new_boss
 function get_new_boss()
+	if G.GAME.selected_back.name == "b_finity_taunting" then
+		local _savetable = G.PROFILES[G.SETTINGS.profile]["finityblinddeckdata"]
+		return _savetable[5]
+	end
 	for k, v in pairs(G.P_BLINDS) do
 		if not G.GAME.bosses_used[k] then
 			G.GAME.bosses_used[k] = 0
@@ -1029,7 +1181,7 @@ SMODS.Joker {
 	soul_pos = { x = 1, y = 2 },
 	calculate = function(self, card, context)
 		for i = 1, #G.jokers.cards do
-			if G.jokers.cards[i] ~= card and G.jokers.cards[i].config.center.key ~= "j_finity_amberacorn" then
+			if G.jokers.cards[i] ~= card and G.jokers.cards[i].config.center.key ~= "j_finity_obsidianorb" then
 				SMODS.calculate_effect(SMODS.blueprint_effect(card, G.jokers.cards[i], context)or{}, context.blueprint_card or card)
 			end
 		end
@@ -1206,8 +1358,8 @@ SMODS.Joker {
     loc_txt = {
         name = "Lilac Lasso",
         text = {
-            "Gains {X:mult,C:white}X#2#{} Mult when hand is ",
-			"played per empty {C:attention}Joker{} slot",
+            "Gains {X:mult,C:white}X#2#{} Mult per empty {C:attention}Joker{}",
+			"slot when hand is played ",
 			"{C:inactive}(Currently {X:mult,C:white}X#1#{C:inactive} Mult)"
         }
     },
@@ -1258,4 +1410,14 @@ function Card:is_suit(suit, bypass_debuff, flush_calc)
 		return old_card_is_suit(self, suit, bypass_debuff, flush_calc)
 	end
 end
+end
+function safely_get(t, ...)
+	local current = t
+	for _, k in ipairs({ ... }) do
+		if not current or current[k] == nil then
+			return false
+		end
+		current = current[k]
+	end
+	return current
 end
