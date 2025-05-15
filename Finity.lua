@@ -1443,7 +1443,6 @@ function Card:is_suit(suit, bypass_debuff, flush_calc)
 	end
 end
 end
-
 function safely_get(t, ...)
 	local current = t
 	for _, k in ipairs({ ... }) do
@@ -1453,6 +1452,16 @@ function safely_get(t, ...)
 		current = current[k]
 	end
 	return current
+end
+function FinityRemoveMatchingKeys(t1, t2)
+	if not t1 or not t2 then return {} end
+    local result = {}
+    for key, value in pairs(t1) do
+        if not t2[key] then
+            result[key] = value 
+        end
+    end
+    return result
 end
 
 G.localization.descriptions.Other['crimsonmark'] =  {

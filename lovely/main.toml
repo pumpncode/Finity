@@ -115,13 +115,15 @@ target = "functions/common_events.lua"
 pattern = "full_UI_table = {"
 position = "before"
 payload = '''
-local _marklessbadges = {}
+local _markbadges = {}
 	badges = badges or {}
-	for i = 1, #badges do
-		if badges[i] ~= 'heart_mark' and badges[i] ~= 'bell_mark' and badges[i] ~= 'raindrop_mark' then
-			table.insert(_marklessbadges, badges[i])
+	print(badges)
+	for k, v in ipairs(badges) do
+		if v == 'heart_mark' or v == 'bell_mark' or v == 'raindrop_mark' then
+			_markbadges[k] = v
 		end
 	end
+	print(_markbadges)
 '''
 match_indent = true
 
@@ -130,6 +132,6 @@ match_indent = true
 target = "functions/common_events.lua"
 pattern = "badges = badges or {}"
 position = "at"
-payload = '''badges = _marklessbadges or {}'''
+payload = '''badges = FinityRemoveMatchingKeys(badges, _markbadges)'''
 match_indent = true
 overwrite = true
