@@ -19,6 +19,7 @@ pattern = "self.GAME.round_resets.blind_choices.Boss = get_new_boss()"
 position = "before"
 payload = '''
 if G.GAME.selected_back.name == "b_finity_challenger" and CardSleeves and G.GAME.selected_sleeve and G.GAME.selected_sleeve == "sleeve_finity_challenger" then
+    G.finityvvcheck = true
     self.GAME.round_resets.blind_choices.Big = get_new_boss()
 end
 '''
@@ -68,25 +69,12 @@ match_indent = true
 
 [[patches]]
 [patches.pattern]
-target = "game.lua"
-pattern = "self.GAME.round_resets.blind_choices.Boss = get_new_boss()"
-position = "before"
-payload = '''
-if CardSleeves and G.GAME.selected_sleeve and G.GAME.selected_sleeve == "sleeve_finity_challenger" and G.GAME.selected_back.name == "b_finity_challenger" then
-self.GAME.round_resets.blind_choices.Big = get_new_boss()
-else
-    self.GAME.round_resets.blind_choices.Big = 'bl_big'
-end
-'''
-match_indent = true
-
-[[patches]]
-[patches.pattern]
 target = "functions/common_events.lua"
 pattern = "G.GAME.round_resets.blind_choices.Boss = get_new_boss()"
 position = "before"
 payload = '''
 if CardSleeves and G.GAME.selected_sleeve and G.GAME.selected_sleeve == "sleeve_finity_challenger" and G.GAME.selected_back.name == "b_finity_challenger" then
+    G.finityvvcheck = true
     G.GAME.round_resets.blind_choices.Big = get_new_boss()
 elseif G.GAME.modifiers.cry_rush_hour_ii then
     G.GAME.round_resets.blind_choices.Small = get_new_boss()
@@ -96,3 +84,52 @@ else
 end
 '''
 match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "card.lua"
+pattern = "if self.pinned then badges[#badges + 1] = 'pinned_left' end"
+position = "after"
+payload = '''
+if self.ability.finitycrimsonheartmark then badges[#badges + 1] = 'heart_mark' end
+if self.ability.finityceruleanbellmark then badges[#badges + 1] = 'bell_mark' end
+if self.ability.finityrazzleraindropmark then badges[#badges + 1] = 'raindrop_mark' end
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "functions/common_events.lua"
+pattern = "if v == 'pinned_left' then info_queue[#info_queue+1] = {key = 'pinned_left', set = 'Other'} end"
+position = "before"
+payload = '''
+if v == 'heart_mark' then info_queue[#info_queue+1] = {set = 'Other', key = 'crimsonmark'} end
+if v == 'bell_mark' then info_queue[#info_queue+1] = {set = 'Other', key = 'ceruleanmark'} end
+if v == 'raindrop_mark' then info_queue[#info_queue+1] = {set = 'Other', key = 'razzlemark'} end
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "functions/common_events.lua"
+pattern = "full_UI_table = {"
+position = "before"
+payload = '''
+local _marklessbadges = {}
+	badges = badges or {}
+	for i = 1, #badges do
+		if badges[i] ~= 'heart_mark' and badges[i] ~= 'bell_mark' and badges[i] ~= 'raindrop_mark' then
+			table.insert(_marklessbadges, badges[i])
+		end
+	end
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "functions/common_events.lua"
+pattern = "badges = badges or {}"
+position = "at"
+payload = '''badges = _marklessbadges or {}'''
+match_indent = true
+overwrite = true

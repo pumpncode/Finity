@@ -79,15 +79,29 @@ SMODS.Tag {
     end,
     config = { joker = "none", display = "(Beaten blind)" },
 	loc_vars = function(self, info_queue, tag)
+		local _showdowntoget = ""
+		local _willorgain = ""
+		local _moneytogain = ""
+		local _returnquestion = ""
+		local _parenthesistext = ""
+		if tag.config.joker == "none" and G.jokers then
+			_willorgain = "Earn "
+			_moneytogain = "$10"
+			_parenthesistext = "(Tag is not authentic)"
+		else
+			_showdowntoget = tag.config.display
+			_willorgain = " will"
+			_returnquestion = "return in the next shop..."
+		end
 		return {
-            vars = {tag.config.display}
+            vars = {_showdowntoget,_willorgain,_returnquestion,_moneytogain,_parenthesistext}
         }
 	end,
 	loc_txt={
         name = "Showdown Tag",
         text = {
-            "{C:attention}#1#{} will",
-			"return in the next shop...",
+            "{C:attention}#1#{} #2#{C:money}#4#",
+			"#3#{C:inactive}#5#",
         }
     }, --the tag creates a joker based on the string provided by the wrapped function below
     apply = function(self, tag, context)
@@ -114,6 +128,7 @@ SMODS.Tag {
 						card:set_cost()
 						return true
 					end)
+				ease_dollars(10)
 				tag.triggered = true
 				return card
 			end
@@ -165,8 +180,8 @@ SMODS.Joker {
 			local _newrarity
 			local _raritiesstring = {"Common", "Uncommon", "Rare", "Legendary"}
 			if next(SMODS.find_mod('Cryptid')) then
-				_raritylist = {1,{2,"cry_candy"},{3,"poke_safari"},"cry_epic",{4,"finity_showdown","poke_mega"},"cry_exotic"}
-				_raritiesstring = {"Common", "Uncommon", "Rare", "cry_epic", "Legendary", "cry_exotic"}
+				_raritylist = {1,{2,"cry_candy"},{3,"poke_safari"},"cry_epic",{4,"finity_showdown","poke_mega","entr_reverse_legendary"},"cry_exotic","entr_entropic","entr_zenith"}
+				_raritiesstring = {"Common", "Uncommon", "Rare", "cry_epic", "Legendary", "cry_exotic","entr_entropic"}
 			end
 			for index, value in ipairs(_raritylist) do
 				if value == _rarity then
@@ -207,8 +222,8 @@ SMODS.Joker {
         name = "Violet Vessel",
         text = {
             "All {C:attention}Boss Blinds{} become {C:purple}The Wall{} or ",
-			"{C:purple}Violet Vessel{}, gains {X:mult,C:white}XMult{} equal to ",
-			"{C:attention}score surplus ratio{} after beating them",
+			"{C:purple}Violet Vessel{}, gains {X:mult,C:white}XMult{} equal to {C:attention}score",
+			"{C:attention}surplus ratio{} after beating a {C:attention}Boss Blind{}",
 			"{C:inactive,s:0.8}(Max {X:mult,C:white,s:0.8}X#2#{C:inactive,s:0.8} Mult per round, currently {X:mult,C:white,s:0.8}X#1#{C:inactive,s:0.8} Mult)",
         }
     },
@@ -230,14 +245,12 @@ SMODS.Joker {
     pos = { x = 0, y = 4 },
     cost = 10,
 	soul_pos = { x = 1, y = 4 },
+	add_to_deck = function(self, card, from_debuff)
+		G.E_MANAGER:add_event(Event({trigger = 'after',delay = 0.1,func = function()
+		G.GAME.round_resets.blind_choices.Boss = get_new_boss()
+		return true end }))
+	end,
 	calculate = function(self, card, context)
-		if not context.blueprint then
-			if (G.GAME.round_resets.ante % G.GAME.win_ante == 0 or G.GAME.selected_back.name == "b_finity_challenger" or G.GAME.selected_sleeve =="sleeve_finity_challenger") and G.GAME.round_resets.blind_choices.Boss ~= "bl_final_vessel" then
-				G.GAME.round_resets.blind_choices.Boss = "bl_final_vessel"
-			elseif G.GAME.round_resets.blind_choices.Boss ~= "bl_wall" and G.GAME.round_resets.blind_choices.Boss ~= "bl_final_vessel" then
-				G.GAME.round_resets.blind_choices.Boss = "bl_wall"
-			end
-		end
 		if context.joker_main and to_big(card.ability.extra.xmult) > to_big(1) then
             return {
                 Xmult_mod = card.ability.extra.xmult,
@@ -736,9 +749,6 @@ SMODS.Back{
 		dollars = 6,
 		joker_slot = 1
     },
-	apply = function(self)
-        G.GAME.round_resets.blind_choices.Boss = get_new_boss()
-    end
 }
 G.finityblinddecktype = {"bl_final_bell","Cerulean Bell","notchange","atlas","pos"}
 SMODS.Back{
@@ -763,6 +773,8 @@ SMODS.Back{
 		G.PROFILES[G.SETTINGS.profile]["finityblinddeckdata"][5] = G.finityblinddecktype[1]
 		G.PROFILES[G.SETTINGS.profile]["finityblinddeckdata"][6] = G.finityblinddecktype[4]
 		G.PROFILES[G.SETTINGS.profile]["finityblinddeckdata"][7] = G.finityblinddecktype[5]
+		G.GAME.banned_keys[v_directors_cut] = true
+		G.GAME.banned_keys[v_retcon] = true
     end
 }
 local oldclick = Card.click
@@ -905,35 +917,46 @@ function get_new_boss()
 		end
 	end
     local boss = old_get_new_boss()
-    if G.GAME.selected_back.name == "b_finity_challenger" or G.GAME.selected_sleeve == "sleeve_finity_challenger" then
-        local eligible_bosses = {}
-        for k, v in pairs(G.P_BLINDS) do
-            if v.boss and v.boss.showdown then
-                eligible_bosses[k] = true
-            end
-        end
-        for k, v in pairs(G.GAME.banned_keys) do
-            eligible_bosses[k] = nil
-        end
+	if string.sub(boss, 1, 15) ~= "bl_akyrs_master" and vvcheck ~= "vv" then
+		if next(SMODS.find_card('j_finity_violetvessel')) and not G.finityvvcheck then
+			if string.sub(boss, 1, 15) == "bl_akyrs_expert" then
+				boss = "bl_akyrs_expert_inflation"
+			elseif (G.GAME.round_resets.ante % G.GAME.win_ante == 0 or G.GAME.selected_back.name == "b_finity_challenger" or G.GAME.selected_sleeve =="sleeve_finity_challenger") then
+				boss = "bl_final_vessel"
+			else
+				boss = "bl_wall"
+			end
+		elseif G.GAME.selected_back.name == "b_finity_challenger" or G.GAME.selected_sleeve == "sleeve_finity_challenger" then
+			local eligible_bosses = {}
+			for k, v in pairs(G.P_BLINDS) do
+				if v.boss and v.boss.showdown then
+					eligible_bosses[k] = true
+				end
+			end
+			for k, v in pairs(G.GAME.banned_keys) do
+				eligible_bosses[k] = nil
+			end
 
-        local min_use = 100
-        for k, v in pairs(G.GAME.bosses_used) do
-            if eligible_bosses[k] then
-                eligible_bosses[k] = v
-                min_use = math.min(min_use, eligible_bosses[k])
-            end
-        end
-
-        for k, v in pairs(eligible_bosses) do
-            if v and v > min_use then
-                eligible_bosses[k] = nil
-            end
-        end
-
-        local _, new_boss = pseudorandom_element(eligible_bosses, pseudoseed('boss'))
-        G.GAME.bosses_used[new_boss] = G.GAME.bosses_used[new_boss] + 1
-        boss = new_boss
-    end
+			local min_use = 100
+			for k, v in pairs(G.GAME.bosses_used) do
+				if eligible_bosses[k] then
+					eligible_bosses[k] = v
+					min_use = math.min(min_use, eligible_bosses[k])
+				end
+			end
+	
+			for k, v in pairs(eligible_bosses) do
+				if v and v > min_use then
+					eligible_bosses[k] = nil
+				end
+			end
+	
+			local _, new_boss = pseudorandom_element(eligible_bosses, pseudoseed('boss'))
+			G.GAME.bosses_used[new_boss] = G.GAME.bosses_used[new_boss] + 1
+			boss = new_boss
+		end
+	end
+	G.finityvvcheck = nil
     return boss
 end
 
@@ -1103,10 +1126,16 @@ SMODS.Joker {
 				local _rarity = G.jokers.cards[virus_pos+1].config.center.rarity
 				local _newrarity
 				local _raritiesstring = {"Common", "Uncommon", "Rare", "cry_epic", "Legendary", "cry_exotic"}
+				if next(SMODS.find_mod('entr')) then
+					table.insert(_raritiesstring, "entr_entropic")
+					table.insert(_raritylist[5], "entr_reverse_legendary")	
+				end
+				print(_raritiesstring)
 				for index, value in ipairs(_raritylist) do
 					if value == _rarity then
 						_newrarity = index + 1
 						_rarity = index
+						print(_newrarity)
 						break
 					elseif type(value) == "table" then
 						for sub_index, sub_value in ipairs(value) do
@@ -1118,7 +1147,7 @@ SMODS.Joker {
 						end
 					end
 				end
-				if _newrarity and _newrarity < 7 and not G.jokers.cards[virus_pos+1].ability.eternal then
+				if _newrarity and _newrarity <= #_raritiesstring and not G.jokers.cards[virus_pos+1].ability.eternal then
 					card:juice_up()
 					G.jokers.cards[virus_pos+1]:start_dissolve()
 					SMODS.add_card { set = 'Joker', rarity = _raritiesstring[_newrarity]}
@@ -1414,6 +1443,7 @@ function Card:is_suit(suit, bypass_debuff, flush_calc)
 	end
 end
 end
+
 function safely_get(t, ...)
 	local current = t
 	for _, k in ipairs({ ... }) do
@@ -1424,3 +1454,22 @@ function safely_get(t, ...)
 	end
 	return current
 end
+
+G.localization.descriptions.Other['crimsonmark'] =  {
+        name = 'Crimson Mark',
+        text = {"Retriggers {C:attention}2",
+				"extra times"
+			},
+    }
+G.localization.descriptions.Other['ceruleanmark'] =  {
+        name = 'Cerulean Mark',
+        text = {"gains {X:mult,C:white}X2{}",
+				"Mult when scored"
+			},
+    }
+G.localization.descriptions.Other['razzlemark'] =  {
+        name = 'Razzle Mark',
+        text = {"Can be used",
+				"as any suit"
+			},
+    }
