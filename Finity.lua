@@ -773,8 +773,8 @@ SMODS.Back{
 		G.PROFILES[G.SETTINGS.profile]["finityblinddeckdata"][5] = G.finityblinddecktype[1]
 		G.PROFILES[G.SETTINGS.profile]["finityblinddeckdata"][6] = G.finityblinddecktype[4]
 		G.PROFILES[G.SETTINGS.profile]["finityblinddeckdata"][7] = G.finityblinddecktype[5]
-		G.GAME.banned_keys[v_directors_cut] = true
-		G.GAME.banned_keys[v_retcon] = true
+		G.GAME.banned_keys["v_directors_cut"] = true
+		G.GAME.banned_keys["v_retcon"] = true
     end
 }
 local oldclick = Card.click
