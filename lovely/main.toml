@@ -117,13 +117,11 @@ position = "before"
 payload = '''
 local _markbadges = {}
 	badges = badges or {}
-	print(badges)
 	for k, v in ipairs(badges) do
 		if v == 'heart_mark' or v == 'bell_mark' or v == 'raindrop_mark' then
 			_markbadges[k] = v
 		end
 	end
-	print(_markbadges)
 '''
 match_indent = true
 
