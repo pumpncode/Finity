@@ -115,6 +115,7 @@ target = "functions/common_events.lua"
 pattern = "full_UI_table = {"
 position = "before"
 payload = '''
+badges=badges or {}
 local _markbadges = {}
 	for k, v in ipairs(badges) do
 		if v == 'heart_mark' or v == 'bell_mark' or v == 'raindrop_mark' then
@@ -123,12 +124,3 @@ local _markbadges = {}
 	end
 '''
 match_indent = true
-
-[[patches]]
-[patches.pattern]
-target = "functions/common_events.lua"
-pattern = "badges = badges or {}"
-position = "at"
-payload = '''badges = FinityRemoveMatchingKeys(badges, _markbadges)'''
-match_indent = true
-overwrite = true
