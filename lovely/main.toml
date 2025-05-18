@@ -88,7 +88,7 @@ match_indent = true
 [[patches]]
 [patches.pattern]
 target = "card.lua"
-pattern = "if self.pinned then badges[#badges + 1] = 'pinned_left' end"
+pattern = "if self.ability.rental then badges[#badges + 1] = 'rental' end"
 position = "after"
 payload = '''
 if self.ability.finitycrimsonheartmark then badges[#badges + 1] = 'heart_mark' end
@@ -116,7 +116,6 @@ pattern = "full_UI_table = {"
 position = "before"
 payload = '''
 local _markbadges = {}
-	badges = badges or {}
 	for k, v in ipairs(badges) do
 		if v == 'heart_mark' or v == 'bell_mark' or v == 'raindrop_mark' then
 			_markbadges[k] = v
