@@ -124,3 +124,12 @@ local _markbadges = {}
 	end
 '''
 match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "functions/common_events.lua"
+pattern = "badges = badges or {}"
+position = "at"
+payload = '''badges = FinityRemoveMatchingKeys(badges, _markbadges)'''
+match_indent = true
+overwrite = true
