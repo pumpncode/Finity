@@ -6,8 +6,9 @@ SMODS.Atlas({key = 'akyrsbossjokers', path = 'compat/aikoyorisshenanigans.png', 
 SMODS.Atlas({key = 'consumables', path = 'consumables.png', px = 71, py = 95})
 SMODS.Atlas({key = 'marks', path = 'marks.png', px = 71, py = 95})
 SMODS.Atlas({key = 'backs', path = 'backs.png', px = 71, py = 95})
-SMODS.Atlas({key = 'sleeves', path = 'sleeves.png', px = 73, py = 94})
+SMODS.Atlas({key = 'sleeves', path = 'compat/sleeves.png', px = 73, py = 94})
 SMODS.Atlas({key = 'blinddeck', path = 'blinddeck.png', px = 71, py = 95})
+SMODS.Atlas({key = 'partners', path = 'compat/partners.png', px = 46, py = 58})
 
 
 SMODS.current_mod.optional_features = function()
@@ -66,6 +67,28 @@ FinisherBossBlinddecksprites = {
 	["bl_akyrs_final_razzle_raindrop"] = {"finity_blinddeck",{ x = 1, y = 2 }},
 	["bl_akyrs_final_lilac_lasso"] = {"finity_blinddeck",{ x = 2, y = 2 }}
 }
+
+--another optional feature is having the boss joker cards appear and say a quip instead of jimbo when losing to their respective blinds.
+--["boss blind key"] = {"identifier of your quips in the localization files", number of quips}
+--structure your quips this way: lq_identifier_quipnumber
+
+FinisherBossBlindQuips = {
+    ["bl_final_acorn"] = {"amber",3},
+    ["bl_final_leaf"] = {"verdant",3},
+    ["bl_final_vessel"] = {"violet",3},
+	["bl_final_heart"] = {"crimson",3},
+	["bl_final_bell"] = {"cerulean",3},
+	["bl_cry_lavender_loop"] = {"lavender",3}, --built-in cross-mod jokers
+	["bl_cry_tornado"] = {"turquoise",3},
+	["bl_cry_vermillion_virus"] = {"vermillion",3},
+	["bl_cry_sapphire_stamp"] = {"sapphire",3},
+	["bl_cry_obsidian_orb"] = {"obsidian",3},
+	["bl_cry_trophy"] = {"lemon",3},
+	["bl_akyrs_final_periwinkle_pinecone"] = {"periwinkle",3},
+	["bl_akyrs_final_razzle_raindrop"] = {"razzle",3},
+	["bl_akyrs_final_lilac_lasso"] = {"lilac",3},
+	}
+	
 --and that's all you have to do with stuff here, create your boss joker, make sure to give it the showdown rarity
 --and you're good to go, as you can see below the mod handles everything else by itself
 
@@ -260,7 +283,6 @@ SMODS.Joker {
 		if context.after and context.cardarea == G.jokers and G.GAME.blind:get_type() == "Boss" and not context.blueprint then
 		    if to_big(G.GAME.chips) + to_big(hand_chips) * to_big(mult) > to_big(G.GAME.blind.chips) then
 				local surplus = (to_big(G.GAME.chips) + to_big(hand_chips) * to_big(mult))/to_big(G.GAME.blind.chips)
-				print(surplus)
 				if to_big(surplus) < to_big(0.01) then
 					surplus = 0.01
 				end
@@ -802,11 +824,17 @@ local oldclick = Card.click
 				local _values = {}
 				local _atlas
 				local _coords
+				local _finityisitinthere = 0
 				for k, v in pairs(eligible_bosses) do
+					if k == G.finityblinddecktype[1] then
+						_finityisitinthere = _finityisitinthere + 1
+					end
 					table.insert(_keys, k)
 					table.insert(_values, v)
 				end
-
+				if _finityisitinthere == 0 then
+					table.insert(_keys, G.finityblinddecktype[1])
+				end
 				for i, k in ipairs(_keys) do
 					if k == G.finityblinddecktype[1] then
 						local next_index = (i % #_keys) + 1
@@ -1130,12 +1158,10 @@ SMODS.Joker {
 					table.insert(_raritiesstring, "entr_entropic")
 					table.insert(_raritylist[5], "entr_reverse_legendary")	
 				end
-				print(_raritiesstring)
 				for index, value in ipairs(_raritylist) do
 					if value == _rarity then
 						_newrarity = index + 1
 						_rarity = index
-						print(_newrarity)
 						break
 					elseif type(value) == "table" then
 						for sub_index, sub_value in ipairs(value) do
@@ -1211,14 +1237,36 @@ SMODS.Joker {
     pos = { x = 0, y = 2 },
     cost = 10,
 	soul_pos = { x = 1, y = 2 },
-	calculate = function(self, card, context)
+	calculate = function(self, card, context) --huge thanks to Somethingcom515 for helping me with this multi-blueprint effect
+	local effects_table = {}                  --anyone reading this should definitely check out his awesome mod "seals on everything" :)
 		for i = 1, #G.jokers.cards do
 			if G.jokers.cards[i] ~= card and G.jokers.cards[i].config.center.key ~= "j_finity_obsidianorb" then
-				SMODS.calculate_effect(SMODS.blueprint_effect(card, G.jokers.cards[i], context)or{}, context.blueprint_card or card)
+				local effect = SMODS.blueprint_effect(card, G.jokers.cards[i], context)
+				if effect then
+					effect.colour = G.C.BLACK
+				end
+				effects_table[#effects_table+1] = effect
 			end
 		end
+		return finity_obsidian_recursive(effects_table, 1)
 	end,
 }
+function finity_obsidian_recursive(table_return_table, index)
+    local ret = table_return_table[index]
+    if index <= #table_return_table then
+        local function getDeepest(tbl)
+            tbl = tbl or {}
+            while tbl.extra do
+                tbl = tbl.extra
+            end
+            return tbl
+        end
+        local prev = getDeepest(ret)
+        prev.extra = finity_obsidian_recursive(table_return_table, index + 1)
+    end
+    return ret
+end
+
 SMODS.Joker {
     key = "lemontrophy",
     name = "Lemon Trophy",
@@ -1443,6 +1491,105 @@ function Card:is_suit(suit, bypass_debuff, flush_calc)
 	end
 end
 end
+
+if next(SMODS.find_mod('partner')) then
+--[[Partner_API.Partner{
+	key = "lovesick",
+    name = "The Lovesick",
+    unlocked = true,
+    discovered = true,
+	individual_quips = true,
+    pos = {x = 0, y = 0},
+    loc_txt = {
+        name = "The Lovesick",
+        text = {
+            "One random {C:attention}Joker{} is {C:attention}marked",
+			"every hand, gains {C:mult}+#2#{} Mult",
+			"when a marked {C:attention}Joker{} triggers",
+			"{C:inactive}(currently {C:mult}+#1#{C:inactive} Mult)"
+        }
+    },
+    atlas = "partners",
+    config = {extra = {related_card = "j_finity_crimsonheart", mult = 0, mult_mod = 0.5}, hand_played = true},
+    loc_vars = function(self, info_queue, card)
+        local benefits = 1
+        if next(SMODS.find_card(card.ability.extra.related_card)) then benefits = 2 end
+        return { vars = {card.ability.extra.mult,card.ability.extra.mult_mod*benefits} }
+    end,
+    calculate = function(self, card, context)
+        if (context.partner_hand_drawn and card.ability.hand_played == true) or context.partner_end_of_round then
+			for i = 1, #G.jokers.cards do
+				if G.jokers.cards[i].ability.finitycrimsonheartmark and G.jokers.cards[i].ability.finitycrimsonheartmark == "lovesick" then
+					G.jokers.cards[i].ability.finitycrimsonheartmark = nil
+					if G.jokers.cards[i].finity then
+						G.jokers.cards[i].finity.floating_sprite_mark = nil
+					end
+				end
+			end
+			if context.partner_hand_drawn then
+				card.ability.hand_played = false
+				local _heartlesstable = {}
+				for _, v in ipairs(G.jokers.cards) do
+					if v ~= card and v.config.center.key ~= "j_finity_crimsonheart" and not v.ability.finitycrimsonheartmark then
+						table.insert(_heartlesstable, v)
+					end
+				end
+				if next(_heartlesstable) ~= nil then
+					local _heart_target = pseudorandom_element(_heartlesstable)
+					_heart_target.ability.finitycrimsonheartmark = "lovesick"
+					_heart_target.finity = {}
+					_heart_target.finity.floating_sprite_mark = Sprite(
+					_heart_target.T.x,
+					_heart_target.T.y,
+					_heart_target.T.w,
+					_heart_target.T.h,
+					G.ASSET_ATLAS['finity_marks'],
+					{ x = 0, y = 0 }
+					)
+					_heart_target.finity.floating_sprite_mark.role.draw_major = _heart_target
+					_heart_target.finity.floating_sprite_mark.states.hover.can = false
+					_heart_target.finity.floating_sprite_mark.states.click.can = false
+					_heart_target:juice_up(0.3, 0.5)
+					card:juice_up(0.3, 0.5)
+				end
+			end
+		end
+    end,
+}]]
+Partner_API.Partner{
+    key = "scrooge",
+    name = "The Scrooge",
+    unlocked = true,
+    discovered = true,
+	individual_quips = true,
+    pos = {x = 3, y = 0},
+    loc_txt = {
+        name = "The Scrooge",
+        text = {
+            "Earn {C:money}#1#${} when",
+			"you sell a card",
+        }
+    },
+    atlas = "partners",
+    config = {extra = {related_card = "j_finity_verdantleaf", money = 1}},
+    loc_vars = function(self, info_queue, card)
+        local benefits = 1
+        if next(SMODS.find_card(card.ability.extra.related_card)) then benefits = 2 end
+        return { vars = {card.ability.extra.money*benefits} }
+    end,
+    calculate = function(self, card, context)
+        if context.partner_selling_card then
+            local benefits = 1
+            if next(SMODS.find_card(card.ability.extra.related_card)) then benefits = 2 end
+			return {
+				dollars = card.ability.extra.money*benefits,
+				card = card
+			}
+        end
+    end,
+}
+end
+
 function safely_get(t, ...)
 	local current = t
 	for _, k in ipairs({ ... }) do

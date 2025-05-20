@@ -10,5 +10,198 @@ return {
 				}
             }
         }
-    }
+    },
+	misc = {
+		quips={
+			lq_crimson_1={
+                "We were having",
+				"so much fun,",
+				"though..!"
+            },
+            lq_crimson_2={
+                "Aww, was my",
+				"love not",
+				"enough?"
+            },
+            lq_crimson_3={
+                "Shame we can't",
+				"play together",
+				"forever..."
+            },
+            lq_cerulean_1={
+                "Sorry, but this",
+				"game is mine",
+				"to win"
+            },
+            lq_cerulean_2={
+                "Did you really",
+				"think you were",
+				"in control?"
+            },
+            lq_cerulean_3={
+                "You ought to",
+				"let me play",
+				"next time"
+            },
+            lq_amber_1={
+                "Oh dear!",
+				"Did I do that?"
+            },
+            lq_amber_2={
+                "Keep better",
+				"track of your",
+				"Jokers next time!"
+            },
+            lq_amber_3={
+                "You need to",
+				"keep organized!"
+            },
+			lq_verdant_1={
+                "Couldn't afford to sell",
+				"me even one of your",
+				"precious Jokers, huh?"
+            },
+			lq_verdant_2 = {
+				"Stingy today,",
+				"are we?",
+			},
+			lq_verdant_3={
+                "Hoarding will",
+				"get you nowhere"
+            },
+            lq_violet_1={
+                "That amount",
+				"won't do at",
+				"all!"
+            },
+            lq_violet_2={
+                "I'm still",
+				"hungry..."
+            },
+            lq_violet_3={
+                "This isn't nearly",
+				"enough Chips to",
+				"satisfy me!"
+            },
+            lq_lavender_1={
+                "Too slow! Hurry",
+				"up next time!"
+            },
+            lq_lavender_2={
+                "Don't waste",
+				"my time"
+            },
+            lq_lavender_3={
+                "What were",
+				"you, asleep?"
+            },
+			lq_turquoise_1={
+                "Such unrefined",
+				"cards!"
+            },
+			lq_turquoise_2={
+                "Tch!"
+            },
+			lq_turquoise_3={
+                "You play just",
+				"like that Violet",
+				"scoundrel!"
+            },
+			lq_vermillion_1={
+                "Eheheh..."
+            },
+			lq_vermillion_2={
+                "Ohhh..."
+            },
+			lq_vermillion_3={
+                "Ahhh, ahah..."
+            },
+			lq_sapphire_1={
+                "Did you miss",
+				"an important",
+				"card, mayhaps?"
+            },
+			lq_sapphire_2={
+                "Ah! I forgot",
+				"to count your",
+				"cards!"
+            },
+			lq_sapphire_3={
+                "...am I forgetting",
+				"something?"
+            },
+			lq_obsidian_1={
+                "..."
+            },
+			lq_obsidian_2={
+                "You must be",
+				"cursed too..."
+            },
+			lq_obsidian_3={
+                "Too bad..."
+            },
+			lq_lemon_1={
+                "Get on my level!"
+            },
+			lq_lemon_2={
+                "Sorry kid, you're",
+				"just not cool",
+				"enough!"
+            },
+			lq_lemon_3={
+                "It'll take more",
+				"Chips than that",
+				"to impress me!"
+            },
+			lq_periwinkle_1={
+                "Your Seals are",
+				"mine! Hehe!"
+            },
+			lq_periwinkle_2={
+                "You shouldn't rely",
+				"so much on Seals",
+				"for everything!"
+            },
+			lq_periwinkle_3={
+                "Even more Seals",
+				"for my collection!"
+            },
+			lq_razzle_1={
+                "Sniff... I can't",
+				"see your suits..."
+            },
+			lq_razzle_2={
+                "Boo hoo..!",
+            },
+			lq_razzle_3={
+                "I- I'm sorry..."
+            },
+			lq_lilac_1={
+                "Don't be so hard",
+				"on yourself, sugar!"
+            },
+			lq_lilac_2={
+                "Sorry, hun, but",
+				"wranglin' your",
+				"Jokers is my job!"
+            },
+			lq_lilac_3={
+                "Y'all come back",
+				"now, y'hear?"
+            },
+			pnr_finity_scrooge_1={
+                "Would you rather",
+				"have $1, or $2?"
+            },
+            pnr_finity_scrooge_2={
+                "Money is my top",
+				"priority"
+            },
+            pnr_finity_scrooge_3={
+                "I'm a secretary",
+				"I know well the",
+				"art of the deal"
+            },
+		}
+	},
 }
