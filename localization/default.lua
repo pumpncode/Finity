@@ -31,7 +31,7 @@ return {
             lq_cerulean_1={
                 "Sorry, but this",
 				"game is mine",
-				"to win"
+				"to win."
             },
             lq_cerulean_2={
                 "Did you really",
@@ -41,7 +41,7 @@ return {
             lq_cerulean_3={
                 "You ought to",
 				"let me play",
-				"next time"
+				"next time."
             },
             lq_amber_1={
                 "Oh dear!",
@@ -67,7 +67,7 @@ return {
 			},
 			lq_verdant_3={
                 "Hoarding will",
-				"get you nowhere"
+				"get you nowhere."
             },
             lq_violet_1={
                 "That amount",
@@ -89,7 +89,7 @@ return {
             },
             lq_lavender_2={
                 "Don't waste",
-				"my time"
+				"my time."
             },
             lq_lavender_3={
                 "What were",
@@ -195,12 +195,12 @@ return {
             },
             pnr_finity_scrooge_2={
                 "Money is my top",
-				"priority"
+				"priority."
             },
             pnr_finity_scrooge_3={
-                "I'm a secretary",
+                "I'm a secretary.",
 				"I know well the",
-				"art of the deal"
+				"art of the deal."
             },
 		}
 	},

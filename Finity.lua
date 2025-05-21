@@ -1232,13 +1232,14 @@ SMODS.Joker {
     discovered = true,
     eternal_compat = true,
     perishable_compat = true,
-    blueprint_compat = true,
+    blueprint_compat = false,
     rarity = "finity_showdown",
     pos = { x = 0, y = 2 },
     cost = 10,
 	soul_pos = { x = 1, y = 2 },
 	calculate = function(self, card, context) --huge thanks to Somethingcom515 for helping me with this multi-blueprint effect
-	local effects_table = {}                  --anyone reading this should definitely check out his awesome mod "seals on everything" :)
+	if context.blueprint then return end      --anyone reading this should definitely check out his awesome mod "seals on everything" :)
+	local effects_table = {}
 		for i = 1, #G.jokers.cards do
 			if G.jokers.cards[i] ~= card and G.jokers.cards[i].config.center.key ~= "j_finity_obsidianorb" then
 				local effect = SMODS.blueprint_effect(card, G.jokers.cards[i], context)
