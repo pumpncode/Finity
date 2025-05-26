@@ -1589,6 +1589,41 @@ Partner_API.Partner{
         end
     end,
 }
+Partner_API.Partner{
+    key = "glutton",
+    name = "The Glutton",
+    unlocked = true,
+    discovered = true,
+	individual_quips = true,
+    pos = {x = 4, y = 0},
+    loc_txt = {
+        name = "The Glutton",
+        text = {
+            "Start blinds with {C:attention}Score",
+			"equal to difference",
+			"between current and",
+			"previous target {C:attention}#1#"
+        }
+    },
+    atlas = "partners",
+    config = {extra = {related_card = "j_finity_violetvessel", previous_score = 0}},
+	loc_vars = function(self, info_queue, card)
+        local benefits = ""
+        if next(SMODS.find_card(card.ability.extra.related_card)) then benefits = "doubled" end
+        return { vars = {benefits} }
+    end,
+    calculate = function(self, card, context)
+        if context.partner_setting_blind then
+			local benefits = 1
+            if next(SMODS.find_card(card.ability.extra.related_card)) then benefits = 2 end
+            local blindvalue = G.GAME.blind.chips
+			if card.ability.extra.previous_score ~= 0 then
+				G.GAME.chips = (G.GAME.chips + G.GAME.blind.chips - card.ability.extra.previous_score) * benefits
+			end
+			card.ability.extra.previous_score = blindvalue
+        end
+    end,
+}
 end
 
 function safely_get(t, ...)
@@ -1613,15 +1648,15 @@ function FinityRemoveMatchingKeys(t1, t2)
 end
 
 G.localization.descriptions.Other['crimsonmark'] =  {
-        name = 'Crimson Mark',
-        text = {"Retriggers {C:attention}2",
-				"extra times"
+        name = 'Mark',
+        text = {"Marked by",
+				"{C:red}Crimson Heart"
 			},
     }
 G.localization.descriptions.Other['ceruleanmark'] =  {
-        name = 'Cerulean Mark',
-        text = {"gains {X:mult,C:white}X2{}",
-				"Mult when scored"
+        name = 'Mark',
+        text = {"Marked by",
+				"{C:blue}Cerulean Bell"
 			},
     }
 G.localization.descriptions.Other['razzlemark'] =  {
