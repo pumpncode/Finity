@@ -202,6 +202,38 @@ return {
 				"I know well the",
 				"art of the deal."
             },
+			pnr_finity_scrooge_4={
+                "Sell your Jokers",
+				"to me,and I'll make",
+				"it worth your while."
+            },
+			pnr_finity_scrooge_5={
+                "A good source of",
+				"income is vital",
+				"to your success."
+            },
+			pnr_finity_glutton_1={
+                "I'm hungry..."
+            },
+            pnr_finity_glutton_2={
+                "I don't like to",
+				"keep high standards",
+				"of people."
+            },
+            pnr_finity_glutton_3={
+                "Good food and",
+				"alcohol is enough",
+				"to keep me happy!"
+            },
+			pnr_finity_glutton_4={
+                "I'll stick around",
+				"so long as you feed",
+				"me well..."
+            },
+			pnr_finity_glutton_5={
+                "Hic..! Ah, I'm a",
+				"bit tipsy..."
+            },
 		}
 	},
 }
