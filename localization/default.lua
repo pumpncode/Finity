@@ -234,6 +234,30 @@ return {
                 "Hic..! Ah, I'm a",
 				"bit tipsy..."
             },
+			pnr_finity_klutz_1={
+                "I'm not wall-eyed!",
+				"I'm just looking",
+				"both ways!"
+            },
+            pnr_finity_klutz_2={
+                "I like to think",
+				"I'm good at",
+				"shuffling a deck."
+            },
+            pnr_finity_klutz_3={
+                "Mind checking that",
+				"I haven't lost any",
+				"of your cards?"
+            },
+			pnr_finity_klutz_4={
+                "My head's spinning",
+				"like a merry-go-round...",
+            },
+			pnr_finity_klutz_5={
+                "I'll keep those",
+				"Jokers of yours",
+				"in order!"
+            },
 		}
 	},
 }

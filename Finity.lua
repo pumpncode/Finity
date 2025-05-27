@@ -287,9 +287,9 @@ SMODS.Joker {
 					surplus = 0.01
 				end
 				if to_big(surplus) >= to_big(card.ability.max) then
-					card.ability.extra.xmult = to_big(card.ability.extra.xmult) + to_big(card.ability.max)
+					card.ability.extra.xmult = to_number(card.ability.extra.xmult) + to_number(card.ability.max)
 				else
-					card.ability.extra.xmult = to_big(card.ability.extra.xmult) + to_big(surplus)
+					card.ability.extra.xmult = to_number(card.ability.extra.xmult) + to_number(surplus)
 				end
 				return {
                     message = "X" .. tostring(card.ability.extra.xmult) .. " Mult",
@@ -692,6 +692,9 @@ SMODS.DrawStep {
 to_big = to_big or function(value)
   return value
 end
+to_number = to_number or function(value)
+    return value
+end
 
 local old_start_run = Game.start_run
 function Game:start_run(args)
@@ -1076,7 +1079,7 @@ SMODS.Joker {
 			"{C:green}#1# in #3#{} chance to be",
 			"destroyed and give their {C:chips}chips",
 			"multiplied by {C:attention}#2#{} to this Joker",
-			"{C:inactive}(currently {C:chips}+#4#{C:inactive} Chips)"
+			"{C:inactive}(Currently {C:chips}+#4#{C:inactive} Chips)"
         }
     },
 	config = {
@@ -1507,7 +1510,7 @@ if next(SMODS.find_mod('partner')) then
             "One random {C:attention}Joker{} is {C:attention}marked",
 			"every hand, gains {C:mult}+#2#{} Mult",
 			"when a marked {C:attention}Joker{} triggers",
-			"{C:inactive}(currently {C:mult}+#1#{C:inactive} Mult)"
+			"{C:inactive}(Currently {C:mult}+#1#{C:inactive} Mult)"
         }
     },
     atlas = "partners",
@@ -1617,11 +1620,60 @@ Partner_API.Partner{
 			local benefits = 1
             if next(SMODS.find_card(card.ability.extra.related_card)) then benefits = 2 end
             local blindvalue = G.GAME.blind.chips
-			if card.ability.extra.previous_score ~= 0 then
+			if card.ability.extra.previous_score ~= 0 and G.GAME.chips + G.GAME.blind.chips - card.ability.extra.previous_score > 0 then
 				G.GAME.chips = (G.GAME.chips + G.GAME.blind.chips - card.ability.extra.previous_score) * benefits
 			end
 			card.ability.extra.previous_score = blindvalue
         end
+    end,
+}
+Partner_API.Partner{
+    key = "klutz",
+    name = "The Klutz",
+    unlocked = true,
+    discovered = true,
+	individual_quips = true,
+    pos = {x = 2, y = 0},
+    loc_txt = {
+        name = "The Klutz",
+        text = {
+            "{C:attention}Shuffle{} all Jokers and",
+			"gain {C:mult}+#2#{} Mult When {C:attention}Blind{}",
+			"is selected, cannot",
+			"rearrange Jokers",
+			"{C:inactive}(Currently {C:mult}+#1#{C:inactive} Mult)"
+        }
+    },
+    atlas = "partners",
+    config = {extra = {related_card = "j_finity_amberacorn", mult = 0, mult_mod = 4}},
+	loc_vars = function(self, info_queue, card)
+        local benefits = 1
+        if next(SMODS.find_card(card.ability.extra.related_card)) then benefits = 2 end
+        return { vars = {card.ability.extra.mult,card.ability.extra.mult_mod*benefits} }
+    end,
+    calculate = function(self, card, context)
+		if context.partner_main and card.ability.extra.mult > 0 then
+            return {
+                message = localize{type = "variable", key = "a_mult", vars = {card.ability.extra.mult}},
+                mult_mod = card.ability.extra.mult,
+            }
+        end
+        if context.partner_setting_blind then
+			card.ability.extra.mult = card.ability.extra.mult + card.ability.extra.mult_mod
+			for i = 1, 3 do
+				G.E_MANAGER:add_event(Event({ trigger = 'after', delay = 0.2, func = function()
+					G.E_MANAGER:add_event(Event({delay = 0.15, func = function() G.jokers:shuffle('aajk'); play_sound('cardSlide1', 0.85);return true end }))
+					G.E_MANAGER:add_event(Event({delay = 0.15, func = function() G.jokers:shuffle('aajk'); play_sound('cardSlide1', 1.15);return true end }))
+					G.E_MANAGER:add_event(Event({delay = 0.5, func = function() G.jokers:shuffle('aajk'); play_sound('cardSlide1', 1);return true end }))
+				return true end }))
+			end
+			return {
+			message = '+'..tostring(card.ability.extra.mult)..' '..localize('k_mult'),
+			colour = G.C.RED,
+			card = card,
+			
+			}
+		end
     end,
 }
 end
