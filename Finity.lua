@@ -113,7 +113,7 @@ SMODS.Tag {
 			_parenthesistext = "(Tag is not authentic)"
 		else
 			_showdowntoget = tag.config.display
-			_willorgain = " will"
+			_willorgain = "will"
 			_returnquestion = "return in the next shop..."
 		end
 		return {
@@ -1602,26 +1602,26 @@ Partner_API.Partner{
     loc_txt = {
         name = "The Glutton",
         text = {
-            "Start blinds with {C:attention}Score",
-			"equal to difference",
-			"between current and",
-			"previous target {C:attention}#1#"
+            "Start blinds with",
+			"{C:attention}Score{} equal to #1#",
+			"difference between current",
+			"and previous target"
         }
     },
     atlas = "partners",
     config = {extra = {related_card = "j_finity_violetvessel", previous_score = 0}},
 	loc_vars = function(self, info_queue, card)
-        local benefits = ""
-        if next(SMODS.find_card(card.ability.extra.related_card)) then benefits = "doubled" end
+        local benefits = "half the"
+        if next(SMODS.find_card(card.ability.extra.related_card)) then benefits = "" end
         return { vars = {benefits} }
     end,
     calculate = function(self, card, context)
         if context.partner_setting_blind then
 			local benefits = 1
             if next(SMODS.find_card(card.ability.extra.related_card)) then benefits = 2 end
-            local blindvalue = G.GAME.blind.chips
-			if card.ability.extra.previous_score ~= 0 and G.GAME.chips + G.GAME.blind.chips - card.ability.extra.previous_score > 0 then
-				G.GAME.chips = (G.GAME.chips + G.GAME.blind.chips - card.ability.extra.previous_score) * benefits
+            local blindvalue = to_number(G.GAME.blind.chips)
+			if to_number(card.ability.extra.previous_score) ~= 0 and to_number(G.GAME.chips) + to_number(G.GAME.blind.chips) - to_number(card.ability.extra.previous_score) > 0 then
+				G.GAME.chips = (to_number(G.GAME.chips) + to_number(G.GAME.blind.chips) - to_number(card.ability.extra.previous_score)) * (benefits/2)
 			end
 			card.ability.extra.previous_score = blindvalue
         end
