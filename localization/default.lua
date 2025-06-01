@@ -189,6 +189,132 @@ return {
                 "Y'all come back",
 				"now, y'hear?"
             },
+			lq_endless_crimson_1={
+                "We were having",
+				"so much fun,",
+				"though..!"
+            },
+            lq_endless_crimson_2={
+                "Aww, was my",
+				"love not",
+				"enough?"
+            },
+            lq_endless_crimson_3={
+                "Shame we can't",
+				"play together",
+				"forever..."
+            },
+            lq_endless_cerulean_1={
+                "Sorry, but this",
+				"game is mine",
+				"to win."
+            },
+            lq_endless_cerulean_2={
+                "Did you really",
+				"think you were",
+				"in control?"
+            },
+            lq_endless_cerulean_3={
+                "You ought to",
+				"let me play",
+				"next time."
+            },
+            lq_endless_amber_1={
+                "Oh dear!",
+				"Did I do that?"
+            },
+            lq_endless_amber_2={
+                "Keep better",
+				"track of your",
+				"Jokers next time!"
+            },
+            lq_endless_amber_3={
+                "You need to",
+				"keep organized!"
+            },
+			lq_endless_verdant_1={
+                "Couldn't afford to sell",
+				"me even one of your",
+				"precious Jokers, huh?"
+            },
+			lq_endless_verdant_2 = {
+				"Stingy today,",
+				"are we?",
+			},
+			lq_endless_verdant_3={
+                "Hoarding will",
+				"get you nowhere."
+            },
+            lq_endless_violet_1={
+                "Any more, and",
+				"I'll get sick!"
+            },
+            lq_endless_violet_2={
+                "Hic..! I think",
+				"I've had enough..."
+            },
+            lq_endless_violet_3={
+                "Still...",
+				"starving..."
+            },
+            lq_endless_lavender_1={
+                "This game's run",
+				"on far too long!"
+            },
+			lq_endless_turquoise_1={
+                "Tsk! Don't know",
+				"when to stop,",
+				"do you?"
+            },
+			lq_endless_vermillion_1={
+                "Eheheh..."
+            },
+			lq_endless_vermillion_2={
+                "Ohhh..."
+            },
+			lq_endless_vermillion_3={
+                "Ahhh, ahah..."
+            },
+			lq_endless_sapphire_1={
+                "Forget that you",
+				"were still playing?",
+            },
+			lq_endless_obsidian_1={
+                "This...",
+				"was inevitable."
+            },
+			lq_endless_lemon_1={
+                "You already won,",
+				"my guy! Chill out!"
+            },
+			lq_endless_periwinkle_1={
+                "You could say...",
+				"your fate was sealed",
+				"from the start!"
+            },
+			lq_endless_razzle_1={
+                "Sniff... I can't",
+				"see your suits..."
+            },
+			lq_endless_razzle_2={
+                "Boo hoo..!",
+            },
+			lq_endless_razzle_3={
+                "I- I'm sorry..."
+            },
+			lq_endless_lilac_1={
+                "Don't be so hard",
+				"on yourself, sugar!"
+            },
+			lq_endless_lilac_2={
+                "Sorry, hun, but",
+				"wranglin' your",
+				"Jokers is my job!"
+            },
+			lq_endless_lilac_3={
+                "Y'all come back",
+				"now, y'hear?"
+            },
 			pnr_finity_scrooge_1={
                 "Would you rather",
 				"have $1, or $2?"

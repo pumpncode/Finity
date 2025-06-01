@@ -10,7 +10,7 @@ SMODS.Atlas({key = 'sleeves', path = 'compat/sleeves.png', px = 73, py = 94})
 SMODS.Atlas({key = 'blinddeck', path = 'blinddeck.png', px = 71, py = 95})
 SMODS.Atlas({key = 'partners', path = 'compat/partners.png', px = 46, py = 58})
 
-
+local finity_config = SMODS.current_mod.config
 SMODS.current_mod.optional_features = function()
     return { retrigger_joker = true }
 end
@@ -72,19 +72,23 @@ FinisherBossBlinddecksprites = {
 --["boss blind key"] = {"identifier of your quips in the localization files", number of quips}
 --structure your quips this way: lq_identifier_quipnumber
 
+--another feature is having specific game over quips for endless, if you want your blind to have some just add them in your
+--localization file as lq_endless_identifier_quipnumber and add the number of quips as the third element in the table
+--["boss blind key"] = {"identifier of your quips in the localization files", number of quips, number of endless quips}
+
 FinisherBossBlindQuips = {
     ["bl_final_acorn"] = {"amber",3},
     ["bl_final_leaf"] = {"verdant",3},
-    ["bl_final_vessel"] = {"violet",3},
+    ["bl_final_vessel"] = {"violet",3,3},
 	["bl_final_heart"] = {"crimson",3},
 	["bl_final_bell"] = {"cerulean",3},
-	["bl_cry_lavender_loop"] = {"lavender",3}, --built-in cross-mod jokers
-	["bl_cry_tornado"] = {"turquoise",3},
-	["bl_cry_vermillion_virus"] = {"vermillion",3},
-	["bl_cry_sapphire_stamp"] = {"sapphire",3},
-	["bl_cry_obsidian_orb"] = {"obsidian",3},
-	["bl_cry_trophy"] = {"lemon",3},
-	["bl_akyrs_final_periwinkle_pinecone"] = {"periwinkle",3},
+	["bl_cry_lavender_loop"] = {"lavender",3,1}, --built-in cross-mod jokers
+	["bl_cry_tornado"] = {"turquoise",3,1},
+	["bl_cry_vermillion_virus"] = {"vermillion",3,3},
+	["bl_cry_sapphire_stamp"] = {"sapphire",3,1},
+	["bl_cry_obsidian_orb"] = {"obsidian",3,1},
+	["bl_cry_trophy"] = {"lemon",3,1},
+	["bl_akyrs_final_periwinkle_pinecone"] = {"periwinkle",3,1},
 	["bl_akyrs_final_razzle_raindrop"] = {"razzle",3},
 	["bl_akyrs_final_lilac_lasso"] = {"lilac",3},
 	}
@@ -198,13 +202,16 @@ SMODS.Joker {
 	soul_pos = { x = 1, y = 3 },
 	calculate = function(self, card, context)
 		if context.selling_card and context.card.ability.set == "Joker" and context.card ~= card then
-			local _raritylist = {1,2,{3,"poke_safari"},{4,"finity_showdown","poke_mega"},"cry_exotic"}
+			local _raritylist = {1,2,{3,"poke_safari","payasaka_ahead"},{4,"finity_showdown","poke_mega","mf_bossblind","payasaka_daeha"},"cry_exotic"}
 			local _rarity = context.card.config.center.rarity
 			local _newrarity
 			local _raritiesstring = {"Common", "Uncommon", "Rare", "Legendary"}
 			if next(SMODS.find_mod('Cryptid')) then
-				_raritylist = {1,{2,"cry_candy"},{3,"poke_safari"},"cry_epic",{4,"finity_showdown","poke_mega","entr_reverse_legendary"},"cry_exotic","entr_entropic","entr_zenith"}
-				_raritiesstring = {"Common", "Uncommon", "Rare", "cry_epic", "Legendary", "cry_exotic","entr_entropic"}
+				_raritylist = {1,{2,"cry_candy"},{3,"poke_safari","payasaka_ahead"},{"cry_epic","mf_bossblind"},{4,"finity_showdown","poke_mega","entr_reverse_legendary","payasaka_daeha"},"cry_exotic",{"entr_entropic","jen_wondrous","jen_ritualistic"},{"entr_zenith","jen_extraordinary","jen_transcendent"},{"jen_omegatranscendent","jen_omnipotent"}}
+				_raritiesstring = {"Common", "Uncommon", "Rare", "cry_epic", "Legendary", "cry_exotic","entr_entropic","jen_extraordinary"}
+				if next(SMODS.find_mod('jen')) then
+					_raritiesstring[7] = "jen_wondrous"
+				end
 			end
 			for index, value in ipairs(_raritylist) do
 				if value == _rarity then
@@ -572,6 +579,8 @@ SMODS.Joker {
 		end
 	end
 }
+
+if finity_config.spectral == true then
 SMODS.Consumable {
 	key = 'finity',
 	name = "Finity",
@@ -605,6 +614,7 @@ SMODS.Consumable {
 		end
 	end,
 }
+end
 local set_spritesref = Card.set_sprites
 function Card:set_sprites(_center, _front)
 	set_spritesref(self, _center, _front)
@@ -960,7 +970,7 @@ function get_new_boss()
 		elseif G.GAME.selected_back.name == "b_finity_challenger" or G.GAME.selected_sleeve == "sleeve_finity_challenger" then
 			local eligible_bosses = {}
 			for k, v in pairs(G.P_BLINDS) do
-				if v.boss and v.boss.showdown then
+				if v.boss and v.boss.showdown and not (string.sub(k, 1, 11) == "bl_jen_epic" and G.GAME.round_resets.ante <= 14) then
 					eligible_bosses[k] = true
 				end
 			end
@@ -1153,13 +1163,15 @@ SMODS.Joker {
 				end
 			end
 			if G.jokers.cards[virus_pos+1] then
-				local _raritylist = {1,{2,"cry_candy"},{3,"poke_safari"},"cry_epic",{4,"finity_showdown","poke_mega"},"cry_exotic"}
+				local _raritylist = {{1,"jen_junk"},{2,"cry_candy"},{3,"poke_safari","payasaka_ahead"},{"cry_epic","mf_bossblind"},{4,"finity_showdown","poke_mega","entr_reverse_legendary","payasaka_daeha"},"cry_exotic"}
 				local _rarity = G.jokers.cards[virus_pos+1].config.center.rarity
 				local _newrarity
 				local _raritiesstring = {"Common", "Uncommon", "Rare", "cry_epic", "Legendary", "cry_exotic"}
-				if next(SMODS.find_mod('entr')) then
+				if next(SMODS.find_mod('entr')) and not next(SMODS.find_mod('jen')) then
 					table.insert(_raritiesstring, "entr_entropic")
-					table.insert(_raritylist[5], "entr_reverse_legendary")	
+				end
+				if next(SMODS.find_mod('jen')) then
+					table.insert(_raritiesstring, "jen_wondrous")
 				end
 				for index, value in ipairs(_raritylist) do
 					if value == _rarity then
@@ -1207,13 +1219,12 @@ SMODS.Joker {
     cost = 10,
 	soul_pos = { x = 1, y = 1 },
 	add_to_deck = function(self, card, from_debuff)
-		G.hand.config.highlighted_limit = G.hand.config.highlighted_limit + 1e20
+		SMODS.change_play_limit(1e6)
+		SMODS.change_discard_limit(1e6)
 	end,
 	remove_from_deck = function(self, card, from_debuff)
-		G.hand.config.highlighted_limit = G.hand.config.highlighted_limit - 1e20
-		if G.hand.config.highlighted_limit < 5 then
-			G.hand.config.highlighted_limit = 5
-		end
+		SMODS.change_play_limit(-1e6)
+		SMODS.change_discard_limit(-1e6)
 		if not G.GAME.before_play_buffer then
 			G.hand:unhighlight_all()
 		end
@@ -1717,3 +1728,13 @@ G.localization.descriptions.Other['razzlemark'] =  {
 				"as any suit"
 			},
     }
+
+SMODS.current_mod.config_tab = function()
+    local stake_colour_options = {}
+
+    return {n = G.UIT.ROOT, config = {r = 0.1, minw = 4, align = "tm", padding = 0.2, colour = G.C.BLACK}, nodes = {
+            {n=G.UIT.R, config = {align = 'cm'}, nodes={
+                create_toggle({label = "Enable spectral card (requires restart)", ref_table = finity_config, ref_value = 'spectral', active_colour = G.C.BLUE, right = true}),
+            }},
+    }}
+end

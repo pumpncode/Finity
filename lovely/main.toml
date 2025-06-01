@@ -141,16 +141,73 @@ pattern = '''if G.OVERLAY_MENU and G.OVERLAY_MENU:get_UIE_by_ID('jimbo_spot') th
 position = "after"
 payload = '''
 if G.GAME.blind and FinisherBossBlindQuips[G.GAME.blind.config.blind.key] then
+	G.GAME.finityshowdownloss = true
 	local text = 'lq_' .. FinisherBossBlindQuips[G.GAME.blind.config.blind.key][1] .. '_' ..math.random(1,FinisherBossBlindQuips[G.GAME.blind.config.blind.key][2])
+	if G.GAME.round_resets.ante >= G.GAME.win_ante then
+		text = 'lq_endless_' .. FinisherBossBlindQuips[G.GAME.blind.config.blind.key][1] .. '_' ..math.random(1,FinisherBossBlindQuips[G.GAME.blind.config.blind.key][3])
+	end
 	Jimbo = Card_Character({x = 0, y = 5})
     local spot = G.OVERLAY_MENU:get_UIE_by_ID('jimbo_spot')
     spot.config.object:remove()
     spot.config.object = Jimbo
     Jimbo.ui_object_updated = true
 	Jimbo:add_speech_bubble(text, nil, {quip = true})
-	Jimbo:say_stuff(5)
+	Jimbo:say_stuff(5 )
+	G.GAME.finityshowdownloss = nil
+	if next(SMODS.find_mod('SealsOnEverything')) then
+		local text2 = 'lq_' .. FinisherBossBlindQuips[G.GAME.blind.config.blind.key][1] .. '_' ..math.random(1,FinisherBossBlindQuips[G.GAME.blind.config.blind.key][2])
+		if G.GAME.round_resets.ante >= G.GAME.win_ante then
+			text2 = 'lq_endless_' .. FinisherBossBlindQuips[G.GAME.blind.config.blind.key][1] .. '_' ..math.random(1,FinisherBossBlindQuips[G.GAME.blind.config.blind.key][3])
+		end
+		G.E_MANAGER:add_event(Event({
+		trigger = 'after',
+		delay = 1,
+		blocking = false,
+		func = (function()
+			if G.OVERLAY_MENU and G.OVERLAY_MENU:get_UIE_by_ID('jimbo_spot') then 
+				Jimbo.ui_object_updated = true
+				Jimbo:add_speech_bubble('again', nil, {quip = true})
+				Jimbo:say_stuff(2)
+			end
+			return true
+		end)
+		}))
+		G.E_MANAGER:add_event(Event({
+			trigger = 'after',
+			delay = 1.5,
+			blocking = false,
+			func = (function()
+				if G.OVERLAY_MENU and G.OVERLAY_MENU:get_UIE_by_ID('jimbo_spot') then 
+					Jimbo.ui_object_updated = true
+					Jimbo:add_speech_bubble(text2, nil, {quip = true})
+					Jimbo:say_stuff(5 )
+				end
+				return true
+			end)
+		}))
+	end
 	return true
 end
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "game.lua"
+pattern = '''if G.GAME.round_resets.ante <= G.GAME.win_ante then --Only add Jimbo to say a quip if the game over happens when the run is lost'''
+position = "at"
+payload = '''
+if G.GAME.round_resets.ante <= G.GAME.win_ante or FinisherBossBlindQuips[G.GAME.blind.config.blind.key][3] then --Only add Jimbo to say a quip if the game over happens when the run is lost
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "game.lua"
+pattern = '''if G.GAME.round_resets.ante <= G.GAME.win_ante or G.GAME.EECardCharacter then --Only add Jimbo to say a quip if the game over happens when the run is lost'''
+position = "at"
+payload = '''
+if G.GAME.round_resets.ante <= G.GAME.win_ante or G.GAME.EECardCharacter or FinisherBossBlindQuips[G.GAME.blind.config.blind.key][3] then --Only add Jimbo to say a quip if the game over happens when the run is lost
 '''
 match_indent = true
 
@@ -160,7 +217,7 @@ target = "card_character.lua"
 pattern = 'self.config = {args = args}'
 position = "after"
 payload = '''
-if G.GAME.blind and FinisherBossBlindQuips[G.GAME.blind.config.blind.key] and not G.GAME.won then
+if G.GAME.blind and G.GAME.finityshowdownloss then
 	self.children.card = Card(self.T.x, self.T.y, G.CARD_W, G.CARD_H, G.P_CARDS.empty, args.center or G.P_CENTERS[FinisherBossBlindStringMap[G.GAME.blind.config.blind.key][1]], {bypass_discovery_center = true})
 else
 '''
@@ -174,4 +231,20 @@ position = "before"
 payload = '''
 end
 '''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "cardarea.lua"
+pattern = "table.sort(self.cards, function (a, b) return a.T.x + a.T.w/2 - 100*((a.pinned and not a.ignore_pinned) and a.sort_id or 0) < b.T.x + b.T.w/2 - 100*((b.pinned and not b.ignore_pinned) and b.sort_id or 0) end)"
+position = "at"
+payload = "if not (G.GAME.selected_partner_card and G.GAME.selected_partner_card.config and G.GAME.selected_partner_card.config.center.key == 'pnr_finity_klutz') then table.sort(self.cards, function (a, b) return a.T.x + a.T.w/2 - 100*((a.pinned and not a.ignore_pinned) and a.sort_id or 0) < b.T.x + b.T.w/2 - 100*((b.pinned and not b.ignore_pinned) and b.sort_id or 0) end) end"
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "cardarea.lua"
+pattern = "if not G.GAME.modifiers.cry_conveyor and not G.GAME.cry_fastened then table.sort(self.cards, function (a, b) return a.T.x + a.T.w/2 - 100*((a.pinned and not a.ignore_pinned) and a.sort_id or 0) < b.T.x + b.T.w/2 - 100*((b.pinned and not b.ignore_pinned) and b.sort_id or 0) end) end"
+position = "at"
+payload = "if not G.GAME.modifiers.cry_conveyor and not G.GAME.cry_fastened and not (G.GAME.selected_partner_card and G.GAME.selected_partner_card.config and G.GAME.selected_partner_card.config.center.key == 'pnr_finity_klutz') then table.sort(self.cards, function (a, b) return a.T.x + a.T.w/2 - 100*((a.pinned and not a.ignore_pinned) and a.sort_id or 0) < b.T.x + b.T.w/2 - 100*((b.pinned and not b.ignore_pinned) and b.sort_id or 0) end) end"
 match_indent = true
