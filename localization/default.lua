@@ -189,10 +189,69 @@ return {
                 "Y'all come back",
 				"now, y'hear?"
             },
+			lq_velvet_1={
+                "You look like you",
+				"could use a smoke..."
+            },
+			lq_velvet_2={
+                "Come again?",
+				"I couldn't quite",
+				"see your ranks..."
+            },
+			lq_velvet_3={
+                "Huff... too bad,",
+				"sweetheart!"
+            },
+			lq_chamomile_1={
+                "Ah, such",
+				"pretty cards..."
+            },
+			lq_chamomile_2={
+                "Sorry, I was",
+				"distracted..!"
+            },
+			lq_chamomile_3={
+                "Huh? Were",
+				"we playing?"
+            },
+			lq_salient_1={
+                "That's just cold..."
+            },
+			lq_salient_2={
+                "You can't just",
+				"choose one or",
+				"the other!"
+            },
+			lq_salient_3={
+                "You're washed up..."
+            },
+			lq_luminous_1={
+                "Oh, the",
+				"party's over?"
+            },
+			lq_luminous_2={
+                "Huh? Over",
+				"already?"
+            },
+			lq_luminous_3={
+                "But we were only",
+				"getting started!"
+            },
+			lq_glorious_1={
+                "My advice:",
+				"git gud!"
+            },
+			lq_glorious_2={
+                "Simply a",
+				"difference",
+				"in skill."
+            },
+			lq_glorious_3={
+                "Total misplay!",
+            },
 			lq_endless_crimson_1={
-                "We were having",
-				"so much fun,",
-				"though..!"
+                "Please",
+				"don't go..."
             },
             lq_endless_crimson_2={
                 "Aww, was my",
@@ -205,14 +264,11 @@ return {
 				"forever..."
             },
             lq_endless_cerulean_1={
-                "Sorry, but this",
-				"game is mine",
-				"to win."
+                "This ends here!"
             },
             lq_endless_cerulean_2={
-                "Did you really",
-				"think you were",
-				"in control?"
+                "I do believe",
+				"it's my turn now."
             },
             lq_endless_cerulean_3={
                 "You ought to",
@@ -266,6 +322,16 @@ return {
 				"when to stop,",
 				"do you?"
             },
+			lq_endless_turquoise_2={
+                "You're as",
+				"insufferable",
+				"as he is..."
+            },
+			lq_endless_turquoise_3={
+                "How dare you show",
+				"your face in my",
+				"presence!"
+            },
 			lq_endless_vermillion_1={
                 "Eheheh..."
             },
@@ -277,11 +343,22 @@ return {
             },
 			lq_endless_sapphire_1={
                 "Forget that you",
-				"were still playing?",
+				"were still playing?"
+            },
+			lq_endless_sapphire_2={
+                "I knew I'd",
+				"forgotten something!"
             },
 			lq_endless_obsidian_1={
                 "This...",
 				"was inevitable."
+            },
+			lq_endless_obsidian_2={
+                "You really are",
+				"cursed..."
+            },
+			lq_endless_obsidian_3={
+                "...still here?"
             },
 			lq_endless_lemon_1={
                 "You already won,",
@@ -314,6 +391,14 @@ return {
 			lq_endless_lilac_3={
                 "Y'all come back",
 				"now, y'hear?"
+            },
+			lq_endless_glorious_1={
+                "GG, well",
+				"played..."
+            },
+			lq_endless_glorious_2={
+                "C-C-C-Combo",
+				"breaker!"
             },
 			pnr_finity_scrooge_1={
                 "Would you rather",

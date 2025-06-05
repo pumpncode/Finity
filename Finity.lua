@@ -9,6 +9,10 @@ SMODS.Atlas({key = 'backs', path = 'backs.png', px = 71, py = 95})
 SMODS.Atlas({key = 'sleeves', path = 'compat/sleeves.png', px = 73, py = 94})
 SMODS.Atlas({key = 'blinddeck', path = 'blinddeck.png', px = 71, py = 95})
 SMODS.Atlas({key = 'partners', path = 'compat/partners.png', px = 46, py = 58})
+SMODS.Atlas({key = 'vrankhc', path = 'compat/vrankhc.png', px = 71, py = 95})
+SMODS.Atlas({key = 'vranklc', path = 'compat/vranklc.png', px = 71, py = 95})
+SMODS.Atlas({key = 'vrankhccompat', path = 'compat/vrankhccompat.png', px = 71, py = 95})
+SMODS.Atlas({key = 'vranklccompat', path = 'compat/vranklccompat.png', px = 71, py = 95})
 
 local finity_config = SMODS.current_mod.config
 SMODS.current_mod.optional_features = function()
@@ -44,7 +48,12 @@ FinisherBossBlindStringMap = {
 	["bl_cry_trophy"] = {"j_finity_lemontrophy","Lemon Trophy"},
 	["bl_akyrs_final_periwinkle_pinecone"] = {"j_finity_periwinklepinecone","Periwinkle Pinecone"},
 	["bl_akyrs_final_razzle_raindrop"] = {"j_finity_razzleraindrop","Razzle Raindrop"},
-	["bl_akyrs_final_lilac_lasso"] = {"j_finity_lilaclasso","Lilac Lasso"}
+	["bl_akyrs_final_lilac_lasso"] = {"j_finity_lilaclasso","Lilac Lasso"},
+	["bl_akyrs_final_velvet_vapour"] = {"j_finity_velvetvapour","Velvet Vapour"},
+	["bl_akyrs_final_chamomile_cloud"] = {"j_finity_chamomilecloud","Chamomile Cloud"},
+	["bl_akyrs_final_salient_stream"] = {"j_finity_salientstream","Salient Stream"},
+	["bl_akyrs_final_luminous_lemonade"] = {"j_finity_luminouslemonade","Luminous Lemonade"},
+	["bl_akyrs_final_glorious_glaive"] = {"j_finity_gloriousglaive","Glorious Glaive"}
 	}
 
 --this table assigns sprites for the Taunting deck and is completely optional	
@@ -65,7 +74,12 @@ FinisherBossBlinddecksprites = {
 	["bl_cry_trophy"] = {"finity_blinddeck",{ x = 4, y = 1 }},
 	["bl_akyrs_final_periwinkle_pinecone"] = {"finity_blinddeck",{ x = 0, y = 2 }},
 	["bl_akyrs_final_razzle_raindrop"] = {"finity_blinddeck",{ x = 1, y = 2 }},
-	["bl_akyrs_final_lilac_lasso"] = {"finity_blinddeck",{ x = 2, y = 2 }}
+	["bl_akyrs_final_lilac_lasso"] = {"finity_blinddeck",{ x = 2, y = 2 }},
+	["bl_akyrs_final_velvet_vapour"] = {"finity_blinddeck",{ x = 4, y = 2 }},
+	["bl_akyrs_final_chamomile_cloud"] = {"finity_blinddeck",{ x = 3, y = 2 }},
+	["bl_akyrs_final_salient_stream"] = {"finity_blinddeck",{ x = 5, y = 2 }},
+	["bl_akyrs_final_luminous_lemonade"] = {"finity_blinddeck",{ x = 6, y = 2 }},
+	["bl_akyrs_final_glorious_glaive"] = {"finity_blinddeck",{ x = 7, y = 2 }}
 }
 
 --another optional feature is having the boss joker cards appear and say a quip instead of jimbo when losing to their respective blinds.
@@ -80,17 +94,22 @@ FinisherBossBlindQuips = {
     ["bl_final_acorn"] = {"amber",3},
     ["bl_final_leaf"] = {"verdant",3},
     ["bl_final_vessel"] = {"violet",3,3},
-	["bl_final_heart"] = {"crimson",3},
-	["bl_final_bell"] = {"cerulean",3},
+	["bl_final_heart"] = {"crimson",3,1},
+	["bl_final_bell"] = {"cerulean",3,2},
 	["bl_cry_lavender_loop"] = {"lavender",3,1}, --built-in cross-mod jokers
-	["bl_cry_tornado"] = {"turquoise",3,1},
+	["bl_cry_tornado"] = {"turquoise",3,3},
 	["bl_cry_vermillion_virus"] = {"vermillion",3,3},
-	["bl_cry_sapphire_stamp"] = {"sapphire",3,1},
-	["bl_cry_obsidian_orb"] = {"obsidian",3,1},
+	["bl_cry_sapphire_stamp"] = {"sapphire",3,2},
+	["bl_cry_obsidian_orb"] = {"obsidian",3,3},
 	["bl_cry_trophy"] = {"lemon",3,1},
 	["bl_akyrs_final_periwinkle_pinecone"] = {"periwinkle",3,1},
 	["bl_akyrs_final_razzle_raindrop"] = {"razzle",3},
 	["bl_akyrs_final_lilac_lasso"] = {"lilac",3},
+	["bl_akyrs_final_velvet_vapour"] = {"velvet",3},
+	["bl_akyrs_final_chamomile_cloud"] = {"chamomile",3},
+	["bl_akyrs_final_salient_stream"] = {"salient",3},
+	["bl_akyrs_final_luminous_lemonade"] = {"luminous",3},
+	["bl_akyrs_final_glorious_glaive"] = {"glorious",3,2},
 	}
 	
 --and that's all you have to do with stuff here, create your boss joker, make sure to give it the showdown rarity
@@ -281,21 +300,23 @@ SMODS.Joker {
 		return true end }))
 	end,
 	calculate = function(self, card, context)
-		if context.joker_main and to_big(card.ability.extra.xmult) > to_big(1) then
+		if (context.joker_main or context.forcetrigger) and to_big(card.ability.extra.xmult) > to_big(1) then
             return {
                 Xmult_mod = card.ability.extra.xmult,
                 message = localize { type = 'variable', key = 'a_xmult', vars = { card.ability.extra.xmult } }
             }
         end
-		if context.after and context.cardarea == G.jokers and G.GAME.blind:get_type() == "Boss" and not context.blueprint then
-		    if to_big(G.GAME.chips) + to_big(hand_chips) * to_big(mult) > to_big(G.GAME.blind.chips) then
-				local surplus = (to_big(G.GAME.chips) + to_big(hand_chips) * to_big(mult))/to_big(G.GAME.blind.chips)
+		if context.end_of_round and not context.repetition and context.cardarea == G.jokers and G.GAME.blind:get_type() == "Boss" and not context.blueprint then
+		    if to_big(G.GAME.chips) > to_big(G.GAME.blind.chips) then
+				local surplus = to_big(G.GAME.chips)/to_big(G.GAME.blind.chips)
 				if to_big(surplus) < to_big(0.01) then
 					surplus = 0.01
 				end
-				if to_big(surplus) >= to_big(card.ability.max) then
-					card.ability.extra.xmult = to_number(card.ability.extra.xmult) + to_number(card.ability.max)
+				if to_number(surplus) >= to_number(card.ability.max) then
+					print(card.ability.max)
+					card.ability.extra.xmult = to_number(card.ability.extra.xmult) + card.ability.max
 				else
+					print(to_number(surplus))
 					card.ability.extra.xmult = to_number(card.ability.extra.xmult) + to_number(surplus)
 				end
 				return {
@@ -340,7 +361,7 @@ SMODS.Joker {
     cost = 10,
 	soul_pos = { x = 1, y = 2 },
 	calculate = function(self, card, context)
-		if context.joker_main and card.ability.extra.xmult > 1 then
+		if (context.joker_main or context.forcetrigger) and card.ability.extra.xmult > 1 then
             return {
                 Xmult_mod = card.ability.extra.xmult,
                 message = localize { type = 'variable', key = 'a_xmult', vars = { card.ability.extra.xmult } }
@@ -898,6 +919,9 @@ end
 
 local old_init_game_object = Game.init_game_object
 function Game:init_game_object()
+	if Cryptid and Cryptid.mod_whitelist then
+		Cryptid.mod_whitelist["Finity"] = true
+	end
 	local ret =old_init_game_object(self)
 	local finityblinddecksave = G.PROFILES[G.SETTINGS.profile]["finityblinddeckdata"]
 	if finityblinddecksave and finityblinddecksave[1] and finityblinddecksave[2] then
@@ -907,6 +931,40 @@ function Game:init_game_object()
 	else
 		G.P_CENTERS.b_finity_taunting.atlas, G.P_CENTERS.b_finity_taunting.pos = "finity_blinddeck", { x = 1, y = 0 }
 		G.PROFILES[G.SETTINGS.profile]["finityblinddeckdata"] = {}
+	end
+	if next(SMODS.find_mod('aikoyorisshenanigans')) then
+		local finitycardcompat = {}
+		if next(SMODS.find_mod('paperback')) then
+			finitycardcompat = {
+			name = 'V of Stars',
+			value = "finity_V",
+			suit = "paperback_Stars",
+			pos = { x = 1, y = 0 },
+			lc_atlas = "finity_vranklccompat",
+			hc_atlas = "finity_vrankhccompat",
+			}
+			G.P_CARDS["paperback_STARS" .. '_' .. "finity_V"] = finitycardcompat
+			finitycardcompat = {
+			name = 'V of Crowns',
+			value = "finity_V",
+			suit = "paperback_Crowns",
+			pos = { x = 1, y = 1 },
+			lc_atlas = "finity_vranklccompat",
+			hc_atlas = "finity_vrankhccompat",
+			}
+			G.P_CARDS["paperback_CROWNS" .. '_' .. "finity_V"] = finitycardcompat
+		end
+		if next(SMODS.find_mod('entr')) then
+			finitycardcompat = {
+			name = 'V of Nil',
+			value = "finity_V",
+			suit = "entr_nilsuit",
+			pos = { x = 2, y = 0 },
+			lc_atlas = "finity_vranklccompat",
+			hc_atlas = "finity_vrankhccompat",
+			}
+			G.P_CARDS["entr_nilsuit" .. '_' .. "finity_V"] = finitycardcompat
+		end
 	end
 	return ret
 end
@@ -1000,6 +1058,16 @@ function get_new_boss()
 	G.finityvvcheck = nil
     return boss
 end
+local old_get_new_superboss = G.get_new_superboss or function()
+  return true
+end
+G.get_new_superboss = function()
+	if next(SMODS.find_card('j_finity_violetvessel')) then
+		return "bl_mf_violet_vessel_dx"
+	end
+	return old_get_new_superboss()
+end
+
 
 --cryptid crossmod jokers
 if next(SMODS.find_mod('Cryptid')) then
@@ -1062,9 +1130,9 @@ SMODS.Joker {
                 message = "START!",
             }
 		end
-		if context.end_of_round and context.main_eval and not context.repetition then
+		if (context.end_of_round and context.main_eval and not context.repetition) or context.forcetrigger then
 			card.ability.inblind = 0
-			if G.TIMERS.REAL - card.ability.start <= 30 then
+			if (G.TIMERS.REAL - card.ability.start <= 30) or context.forcetrigger then
 				card:start_dissolve()
 				SMODS.add_card { set = 'Joker', rarity = "cry_exotic" }
 				return {
@@ -1110,7 +1178,7 @@ SMODS.Joker {
     cost = 10,
 	soul_pos = { x = 1, y = 5 },
 	calculate = function(self, card, context)
-		if context.joker_main and card.ability.extra.chips > 0 then
+		if (context.joker_main or context.forcetrigger) and card.ability.extra.chips > 0 then
             return {
                 chip_mod = card.ability.extra.chips,
                 message = localize { type = 'variable', key = 'a_chips', vars = {card.ability.extra.chips}},
@@ -1154,15 +1222,30 @@ SMODS.Joker {
     cost = 10,
 	soul_pos = { x = 1, y = 0 },
 	calculate = function(self, card, context)
-		if context.end_of_round and context.main_eval and not context.repetition then
+		if (context.end_of_round and context.main_eval and not context.repetition) or context.forcetrigger then
 			local virus_pos
 			for i = 1, #G.jokers.cards do
-				if G.jokers.cards[i] == card then
+				if G.jokers.cards[i] == (context.blueprint_card or card) then
 					virus_pos = i
 					break
 				end
 			end
-			if G.jokers.cards[virus_pos+1] then
+			if not virus_pos then
+				for i = 1, #G.jokers.cards do
+					if G.jokers.cards[i].config.center.key == "j_payasaka_cast" then
+						local area = G["payasaka_cast_jokers_"..tostring(G.jokers.cards[i].sort_id)] or nil
+						if area then
+							for j = 1, #area.cards do
+								if area.cards[j] == (context.blueprint_card or card) then
+									virus_pos = i
+									break
+								end
+							end
+						end
+					end
+				end
+			end
+			if virus_pos and G.jokers.cards[virus_pos+1] then
 				local _raritylist = {{1,"jen_junk"},{2,"cry_candy"},{3,"poke_safari","payasaka_ahead"},{"cry_epic","mf_bossblind"},{4,"finity_showdown","poke_mega","entr_reverse_legendary","payasaka_daeha"},"cry_exotic"}
 				local _rarity = G.jokers.cards[virus_pos+1].config.center.rarity
 				local _newrarity
@@ -1254,16 +1337,30 @@ SMODS.Joker {
 	calculate = function(self, card, context) --huge thanks to Somethingcom515 for helping me with this multi-blueprint effect
 	if context.blueprint then return end      --anyone reading this should definitely check out his awesome mod "seals on everything" :)
 	local effects_table = {}
-		for i = 1, #G.jokers.cards do
-			if G.jokers.cards[i] ~= card and G.jokers.cards[i].config.center.key ~= "j_finity_obsidianorb" then
-				local effect = SMODS.blueprint_effect(card, G.jokers.cards[i], context)
-				if effect then
-					effect.colour = G.C.BLACK
+	local castishere = nil
+	for i = 1, #G.jokers.cards do
+		if G.jokers.cards[i].config.center.key == "j_payasaka_cast" then
+			local area = G["payasaka_cast_jokers_"..tostring(G.jokers.cards[i].sort_id)] or nil
+			if area then
+				for j = 1, #area.cards do
+					if area.cards[j] == (context.blueprint_card or card) then
+						castishere = i
+						break
+					end
 				end
-				effects_table[#effects_table+1] = effect
 			end
 		end
-		return finity_obsidian_recursive(effects_table, 1)
+	end
+	for i = 1, #G.jokers.cards do
+		if G.jokers.cards[i] ~= card and G.jokers.cards[i].config.center.key ~= "j_finity_obsidianorb" and G.jokers.cards[i] ~= G.jokers.cards[castishere] then
+			local effect = SMODS.blueprint_effect(card, G.jokers.cards[i], context)
+			if effect then
+				effect.colour = G.C.BLACK
+			end
+			effects_table[#effects_table+1] = effect
+		end
+	end
+	return finity_obsidian_recursive(effects_table, 1)
 	end,
 }
 function finity_obsidian_recursive(table_return_table, index)
@@ -1302,7 +1399,7 @@ SMODS.Joker {
     cost = 10,
 	soul_pos = { x = 1, y = 4 },
 	calculate = function(self, card, context)
-		if context.joker_main then
+		if context.joker_main or context.forcetrigger then
 			return {
 				message = "Balanced?",
 				chip_mod = mult - hand_chips,
@@ -1338,7 +1435,6 @@ SMODS.Joker {
 	calculate = function(self, card, context)
 		if context.blueprint then return end
 		if context.before and context.cardarea == G.jokers and not (context.individual or context.repetition) then
-			local goodseals = {}
 			local _givenseal
 			local given____
 			for i = 1, #context.scoring_hand do
@@ -1348,6 +1444,7 @@ SMODS.Joker {
 					while _givenseal == nil or _givenseal == "akyrs_debuff" do
 						_givenseal = SMODS.poll_seal({guaranteed = true, type_key = seal_type})
 					end
+					context.scoring_hand[i]:juice_up()
 					context.scoring_hand[i]:set_seal(_givenseal)
 				end
 			end
@@ -1408,7 +1505,7 @@ SMODS.Joker {
 		end
     end,
 	calculate = function(self, card, context)
-		if context.joker_main and card.ability.extra.xmult > 1 then
+		if (context.joker_main or context.forcetrigger) and card.ability.extra.xmult > 1 then
             return {
                 Xmult_mod = card.ability.extra.xmult,
                 message = localize { type = 'variable', key = 'a_xmult', vars = { card.ability.extra.xmult } }
@@ -1447,6 +1544,170 @@ SMODS.Joker {
 	end
 }
 SMODS.Joker {
+    key = "velvetvapour",
+    name = "Velvet Vapour",
+    atlas = 'akyrsbossjokers',
+    loc_txt = {
+        name = "Velvet Vapour",
+        text = {
+            "All played {C:attention}#1#s{} and {C:attention}#2#s{} have their rank",
+			"changed to {C:attention}V{} after scoring, played {C:attention}Vs{}",
+			"make the next card permanently gain {C:chips}Chips{}",
+			"equal to double their {C:chips}Chips{} after scoring",
+			"{C:inactive}(Ranks change every round)"
+        }
+    },
+	config = {
+		ranks = { first = "none", second = "none"},
+	},
+	loc_vars = function(self, info_queue, card)
+		return{ vars = {card.ability.ranks.first,card.ability.ranks.second}}
+    end,
+    unlocked = true,
+    discovered = true,
+    eternal_compat = true,
+    perishable_compat = true,
+    blueprint_compat = false,
+    rarity = "finity_showdown",
+    pos = { x = 0, y = 4 },
+    cost = 10,
+	soul_pos = { x = 1, y = 4 },
+	set_ability = function(self, card, initial, delay_sprites)
+		if card.ability.ranks.first == "none" or card.ability.ranks.second == "none" then
+			local rank_choices = {"Ace",2,3,4,5,6,7,8,9,10,"Jack","Queen","King"}
+			local toremove = pseudorandom_element(rank_choices)
+			card.ability.ranks.first = toremove
+			for i, v in ipairs(rank_choices) do
+				if v == toremove then
+					table.remove(rank_choices, i)
+				break
+				end
+			end
+			card.ability.ranks.second = pseudorandom_element(rank_choices)
+		end
+	end,
+	calculate = function(self, card, context)
+		if context.after and context.scoring_hand and not context.blueprint then
+			for i = 1, #context.scoring_hand do
+				if tostring(context.scoring_hand[i].config.card.value) == "finity_V" and context.scoring_hand[i+1] then
+					G.E_MANAGER:add_event(Event({trigger = 'after',delay = 0.1,func = function()
+					bonus = 2 * (2 + context.scoring_hand[i].ability.perma_bonus or 0)
+					context.scoring_hand[i+1].ability.perma_bonus = context.scoring_hand[i+1].ability.perma_bonus or 0
+					context.scoring_hand[i+1].ability.perma_bonus = context.scoring_hand[i+1].ability.perma_bonus + bonus
+					context.scoring_hand[i+1]:juice_up(0.3, 0.3)
+					return true end}))
+					SMODS.calculate_effect({
+						message = "Bonus!",
+						colour = G.C.CHIPS
+					}, context.scoring_hand[i])
+				end
+			end
+			local activated = 0
+			for i = 1, #context.scoring_hand do
+				if tostring(context.scoring_hand[i].config.card.value) == tostring(card.ability.ranks.first) or tostring(context.scoring_hand[i].config.card.value) == tostring(card.ability.ranks.second) then
+					G.E_MANAGER:add_event(Event({trigger = 'after', delay = 0.1, func = function() context.scoring_hand[i]:flip(); play_sound('card1', 1); context.scoring_hand[i]:juice_up(0.3, 0.3); return true end }))
+					G.E_MANAGER:add_event(Event({trigger = 'after',delay = 0.05,func = function()
+						SMODS.change_base(context.scoring_hand[i], context.scoring_hand[i].config.card.suit, "finity_V")
+					return true end}))
+					G.E_MANAGER:add_event(Event({trigger = 'after', delay = 1, func = function() context.scoring_hand[i]:flip(); play_sound('tarot2', 1, 0.6); card:juice_up(0.3, 0.3); context.scoring_hand[i]:juice_up(0.3, 0.3); return true end }))
+					activated = activated + 1
+				end
+			end
+			if activated > 0 then
+				G.E_MANAGER:add_event(Event({trigger = 'after',delay = 2,func = function() return true end}))
+				return {
+				message = "V!",
+				}
+			end
+		end
+		if context.end_of_round and not context.repetition and not context.blueprint then
+			local rank_choices = {"Ace",2,3,4,5,6,7,8,9,10,"Jack","Queen","King"}
+			local toremove = pseudorandom_element(rank_choices)
+			card.ability.ranks.first = toremove
+			for i, v in ipairs(rank_choices) do
+				if v == toremove then
+					table.remove(rank_choices, i)
+				break
+				end
+			end
+			card.ability.ranks.second = pseudorandom_element(rank_choices)
+		end
+	end
+}
+SMODS.Joker {
+    key = "chamomilecloud",
+    name = "Chamomile Cloud",
+    atlas = 'akyrsbossjokers',
+    loc_txt = {
+        name = "Chamomile Cloud",
+        text = {
+            "Add a random {C:attention}enhancement{} to {C:attention,E:2}ALL{} cards",
+			"before scoring, gains {X:mult,C:white}X#2#{} Mult when an",
+			"unenhanced card is enhanced this way",
+			"{C:inactive}(Currently {X:mult,C:white}X#1#{C:inactive} Mult)"
+        }
+    },
+	config = {
+		extra = { xmult = 1 },
+		increase = 0.15,
+	},
+	loc_vars = function(self, info_queue, card)
+        return{ vars = {card.ability.extra.xmult,card.ability.increase}}
+    end,
+    unlocked = true,
+    discovered = true,
+    eternal_compat = true,
+    perishable_compat = true,
+    blueprint_compat = true,
+    rarity = "finity_showdown",
+    pos = { x = 0, y = 3 },
+    cost = 10,
+	soul_pos = { x = 1, y = 3 },
+	calculate = function(self, card, context)
+		if (context.joker_main or context.forcetrigger) and to_big(card.ability.extra.xmult) > to_big(1) then
+            return {
+                Xmult_mod = card.ability.extra.xmult,
+                message = localize { type = 'variable', key = 'a_xmult', vars = { card.ability.extra.xmult } }
+            }
+        end
+		if context.before and context.cardarea == G.jokers and not (context.individual or context.repetition) and not context.blueprint then
+			local _givenenhancement
+			local new__
+			for i = 1, #context.full_hand do
+				if context.full_hand[i].ability.set ~= "Enhanced" then
+					new__ = true
+					card.ability.extra.xmult = card.ability.extra.xmult + card.ability.increase
+				end
+				_givenenhancement = SMODS.poll_enhancement({guaranteed = true})
+				while _givenenhancement == nil or _givenenhancement == "m_akyrs_scoreless" or _givenenhancement == "m_entr_disavowed" or _givenenhancement == "m_unstb_poison"  or _givenenhancement == "m_unstb_radioactive" or _givenenhancement == "m_unstb_biohazard" do
+					_givenenhancement = SMODS.poll_enhancement({guaranteed = false})
+				end
+				context.full_hand[i]:set_ability(G.P_CENTERS[_givenenhancement])
+				context.full_hand[i]:juice_up()
+			end
+			for i = 1, #G.hand.cards do
+				if G.hand.cards[i].ability.set ~= "Enhanced" then
+					new__ = true
+					card.ability.extra.xmult = card.ability.extra.xmult + card.ability.increase
+				end
+				_givenenhancement = SMODS.poll_enhancement({guaranteed = true})
+				while _givenenhancement == nil or _givenenhancement == "m_akyrs_scoreless" or _givenenhancement == "m_entr_disavowed" or _givenenhancement == "m_unstb_poison"  or _givenenhancement == "m_unstb_radioactive" or _givenenhancement == "m_unstb_biohazard" do
+					_givenenhancement = SMODS.poll_enhancement({guaranteed = false})
+				end
+				G.hand.cards[i]:set_ability(G.P_CENTERS[_givenenhancement])
+				G.hand.cards[i]:juice_up()
+			end
+			if new__ == true then
+				return {
+                    message = "X" .. tostring(card.ability.extra.xmult) .. " Mult",
+					colour = G.C.RED,
+                    card = card
+                }
+			end
+		end
+	end
+}
+SMODS.Joker {
     key = "lilaclasso",
     name = "Lilac Lasso",
     atlas = 'akyrsbossjokers',
@@ -1475,7 +1736,7 @@ SMODS.Joker {
     cost = 10,
 	soul_pos = { x = 1, y = 2 },
 	calculate = function(self, card, context)
-		if context.joker_main and card.ability.extra.xmult > 1 then
+		if (context.joker_main or context.forcetrigger) and card.ability.extra.xmult > 1 then
             return {
                 Xmult_mod = card.ability.extra.xmult,
                 message = localize { type = 'variable', key = 'a_xmult', vars = { card.ability.extra.xmult } }
@@ -1489,6 +1750,118 @@ SMODS.Joker {
 				},card)
 		end
 	end
+}
+SMODS.Joker {
+    key = "salientstream",
+    name = "Salient Stream",
+    atlas = 'akyrsbossjokers',
+    loc_txt = {
+        name = "Salient Stream",
+        text = {
+            "{C:red}+1{} discard when a",
+			"hand is played "
+        }
+    },
+	config = {
+		extra = { xmult = 1 },
+		increase = 1,
+	},
+	loc_vars = function(self, info_queue, card)
+        return{ vars = {card.ability.extra.xmult,card.ability.increase}}
+    end,
+    unlocked = true,
+    discovered = true,
+    eternal_compat = true,
+    perishable_compat = true,
+    blueprint_compat = true,
+    rarity = "finity_showdown",
+    pos = { x = 0, y = 5 },
+    cost = 10,
+	soul_pos = { x = 1, y = 5 },
+	calculate = function(self, card, context)
+		if context.joker_main or context.forcetrigger then
+			ease_discard(1)
+            return {
+                message = "+1 Discard",
+				colour = G.C.RED
+            }
+        end
+	end
+}
+SMODS.Joker {
+    key = "luminouslemonade",
+    name = "Luminous Lemonade",
+    atlas = 'akyrsbossjokers',
+    loc_txt = {
+        name = "Luminous Lemonade",
+        text = {
+            "{X:mult,C:white}X#1#{} Mult per unused",
+			"{C:red}discard{} this run",
+			"{X:chips,C:white}X#2#{} Chips per played",
+			"{C:blue}hand{} this run",
+			"{C:inactive,s:0.8}(Currently {X:mult,C:white,s:0.8}X#3#{C:inactive,s:0.8} Mult and {X:chips,C:white,s:0.8}X#4#{C:inactive,s:0.8} Chips)"
+        }
+    },
+	config = {
+		extra = {exmult = 0.1, exchips = 0.1}
+	},
+	loc_vars = function(self, info_queue, card)
+        return{ vars = {card.ability.extra.exmult,card.ability.extra.exchips, card.ability.extra.exmult*G.GAME.unused_discards + 1 or 1, card.ability.extra.exchips * G.GAME.hands_played + 1 or 1}}
+    end,
+    unlocked = true,
+    discovered = true,
+    eternal_compat = true,
+    perishable_compat = true,
+    blueprint_compat = true,
+    rarity = "finity_showdown",
+    pos = { x = 0, y = 6 },
+    cost = 10,
+	soul_pos = { x = 1, y = 6 },
+	calculate = function(self, card, context)
+		if (context.joker_main or context.forcetrigger) and G.GAME.unused_discards and G.GAME.unused_discards > 1 then
+            SMODS.calculate_effect({
+                Xmult_mod = card.ability.extra.exmult*G.GAME.unused_discards + 1,
+                message = localize { type = 'variable', key = 'a_xmult', vars = { card.ability.extra.exmult*G.GAME.unused_discards + 1 } }
+            }, context.blueprint_card or card)
+        end
+		if (context.joker_main or context.forcetrigger) and G.GAME.hands_played and G.GAME.hands_played > 1 then
+            return {
+                xchips = card.ability.extra.exchips * G.GAME.hands_played + 1,
+            }
+        end
+	end
+}
+SMODS.Joker {
+    key = "gloriousglaive",
+    name = "Glorious Glaive",
+    atlas = 'akyrsbossjokers',
+    loc_txt = {
+        name = "Glorious Glaive",
+        text = {
+            "Played cards give",
+			"{X:mult,C:white}X#1#{} Mult when scored",
+        }
+    },
+    config = { extra = { xmult = 1.5 } },
+    loc_vars = function(self, info_queue, card)
+        return { vars = { card.ability.extra.xmult } }
+    end,
+	unlocked = true,
+    discovered = true,
+    eternal_compat = true,
+    perishable_compat = true,
+    blueprint_compat = true,
+    rarity = "finity_showdown",
+    pos = { x = 0, y = 7 },
+    cost = 10,
+	soul_pos = { x = 1, y = 7 },
+    calculate = function(self, card, context)
+        if context.individual and context.cardarea == G.play then
+            return {
+                xmult = card.ability.extra.xmult
+            }
+        end
+    end,
 }
 local old_card_is_suit = Card.is_suit
 function Card:is_suit(suit, bypass_debuff, flush_calc)
@@ -1505,6 +1878,22 @@ function Card:is_suit(suit, bypass_debuff, flush_calc)
 		return old_card_is_suit(self, suit, bypass_debuff, flush_calc)
 	end
 end
+
+SMODS.Rank {
+	hc_atlas = 'vrankhc',
+    lc_atlas = 'vranklc',
+	hidden = true,
+    key = 'V',
+    card_key = 'V',
+    pos = { x = 0 },
+    nominal = 2,
+    shorthand = 'V',
+	in_pool = function(self, args)
+		return false
+	end,
+	should_register = function() end,
+	loc_txt = {name = "V",}
+}
 end
 
 if next(SMODS.find_mod('partner')) then
