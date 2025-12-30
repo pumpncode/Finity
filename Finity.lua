@@ -72,7 +72,7 @@ FinisherBossBlindStringMap = {
 	["bl_csau_mochamike"] = {"j_finity_mochamike","Mocha Mike"},
 	["bl_csau_feltfortress"] = {"j_finity_feltfortress","Felt Fortress"},
 	["bl_poke_cgoose"] = {"j_finity_cgoosejoker","Chartreuse Chamber"},
-	["bl_paperback_taupe_treble"] = {"j_finity_taupetreble","Taupe Treble"}
+	["bl_paperback_taupe_treble"] = {"j_finity_taupetreble","Taupe Treble"},
 	["bl_bunc_final_crown"] = {"j_finity_chartreusecrown","Chartreuse Crown"}
 	}
 
