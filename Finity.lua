@@ -11,6 +11,7 @@ SMODS.Atlas({key = 'cardsaucebossjokers', path = 'compat/cardsauce.png', px = 71
 SMODS.Atlas({key = 'pokermonbossjokers', path = 'compat/pokermon.png', px = 71, py = 95})
 SMODS.Atlas({key = 'pokermonboss_shinyjokers', path = 'compat/pokermonshiny.png', px = 71, py = 95})
 SMODS.Atlas({key = 'paperbackbossjokers', path = 'compat/paperback.png', px = 71, py = 95})
+SMODS.Atlas({key = 'buncobossjokers', path = 'compat/bunco.png', px = 71, py = 95})
 SMODS.Atlas({key = 'consumables', path = 'consumables.png', px = 71, py = 95})
 SMODS.Atlas({key = 'marks', path = 'marks.png', px = 71, py = 95})
 SMODS.Atlas({key = 'backs', path = 'backs.png', px = 71, py = 95})
@@ -72,6 +73,7 @@ FinisherBossBlindStringMap = {
 	["bl_csau_feltfortress"] = {"j_finity_feltfortress","Felt Fortress"},
 	["bl_poke_cgoose"] = {"j_finity_cgoosejoker","Chartreuse Chamber"},
 	["bl_paperback_taupe_treble"] = {"j_finity_taupetreble","Taupe Treble"}
+	["bl_bunc_final_crown"] = {"j_finity_chartreusecrown","Chartreuse Crown"}
 	}
 
 --this table assigns sprites for the Taunting deck and is completely optional	
@@ -2877,6 +2879,49 @@ SMODS.Joker{
     end
 }
 end
+--bunco crossmod jokers
+if next(SMODS.find_mod('Bunco')) then
+SMODS.Joker {
+    key = "chartreusecrown",
+    name = "Chartreuse Crown",
+    atlas = 'buncobossjokers',
+    loc_txt = {
+        name = "Chartreuse Crown",
+        text = {
+			"{C:attention}Retrigger{} all played",
+            "{C:attention}nonstandard suit{} cards, they",
+			"give {X:mult,C:white}X#1#{} Mult when scored"
+        }
+    },
+    config = { extra = { xmult = 1.5 } },
+    loc_vars = function(self, info_queue, card)
+        return { vars = { card.ability.extra.xmult } }
+    end,
+	unlocked = true,
+    discovered = true,
+    eternal_compat = true,
+    perishable_compat = true,
+    blueprint_compat = true,
+    rarity = "finity_showdown",
+    pos = { x = 0, y = 0 },
+    cost = 10,
+	--soul_pos = { x = 0, y = 0 },
+    calculate = function(self, card, context)
+        if context.individual and context.cardarea == G.play and not (context.other_card:is_suit("Hearts") or context.other_card:is_suit("Diamonds") or context.other_card:is_suit("Clubs") or context.other_card:is_suit("Spades")) then
+            return {
+                xmult = card.ability.extra.xmult
+            }
+        end
+		if context.repetition and context.cardarea == G.play and not (context.other_card:is_suit("Hearts") or context.other_card:is_suit("Diamonds") or context.other_card:is_suit("Clubs") or context.other_card:is_suit("Spades")) then
+            return {
+                message = localize('k_again_ex'),
+                repetitions = 1,
+                card = card
+            }
+        end
+    end,
+}
+end
 
 if next(SMODS.find_mod('partner')) then
 Partner_API.Partner{
@@ -4550,5 +4595,4 @@ G.localization.descriptions.Joker['benefitskeeper'] =  {
 			"{C:attention}+1{} consumable slot when",
 			"{C:attention}Periwinkle Pinecone{} is obtained"
         },
-
 }
